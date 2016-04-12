@@ -1,4 +1,4 @@
-### A oh-my-zsh plugin for internet synced zsh_history
+### An oh-my-zsh plugin for internet synced zsh_history
 
 Design
 ------
