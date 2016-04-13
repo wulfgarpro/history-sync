@@ -12,25 +12,30 @@ function history-sync-pull() {
 
 # Push current history to master
 history-sync-push() {
-    read -p "Please enter GPG recipient name: " name
-    NAME=name
+  echo -n "Please enter GPG recipient name: "
+  read name && NAME=name
 
+  if [[ -n $FILE ]]; then
     # Encrypt history file for push
     gpg -r $NAME --encrypt --sign --armor --output $ZSH_HISTORY_FILE_ENC $ZSH_HISTORY_FILE
+  fi
 
-    while true; do
-        read -p "Do you want to commit and push current local history file?" yn
-        case $yn in
-            [Yy]* ) 
-                git commit -am $ZSH_HISTORY_PROJ && git push $ZSH_HISTORY_PROJ; break;;
-            [Nn]* )
-                exit;;
-            * )
-                exit;;
-        esac
-    done
+  echo -n "Do you want to commit and push current local history file?"
+  read commit
+    
+  if [[ -n $commit ]]; then
+    case $commit in
+      [Yy]* ) 
+        git commit -am $ZSH_HISTORY_PROJ && git push $ZSH_HISTORY_PROJ; break;;
+      [Nn]* )
+        exit;;
+      * )
+        exit;;
+    esac
+  fi
 }
 
 # Simple function aliases
 alias hpl=history-sync-pull
 alias hps=history-sync-push
+
