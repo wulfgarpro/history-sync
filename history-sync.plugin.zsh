@@ -26,7 +26,9 @@ history-sync-push() {
   if [[ -n $commit ]]; then
     case $commit in
       [Yy]* ) 
-        git commit -am $ZSH_HISTORY_PROJ && git push $ZSH_HISTORY_PROJ; 
+        git commit -am $ZSH_HISTORY_PROJ 
+        git push $ZSH_HISTORY_PROJ
+
         if [[ $? == 1 ]]; then 
           echo "$fg_bold[red] Fix your git repo..." 
         fi
