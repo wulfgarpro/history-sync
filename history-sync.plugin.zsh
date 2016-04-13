@@ -1,3 +1,6 @@
+autoload -U colors
+colors
+
 ZSH_HISTORY_FILE=$HOME/.zsh_history
 ZSH_HISTORY_PROJ=$HOME/.zsh_history_proj
 ZSH_HISTORY_FILE_ENC=$ZSH_HISTORY_PROJ/zsh_history
@@ -13,31 +16,37 @@ function history-sync-pull() {
 # Push current history to master
 history-sync-push() {
   echo -n "Please enter GPG recipient name: "
-  read name && NAME=name
+  read name
 
-  if [[ -n $FILE ]]; then
-    echo "gpg'ing zsh history file: $ZSH_HISTORY_FILE"
+  if [[ -n $name ]]; then
+    echo
+    echo $bold_color$fg[green]"gpg'ing zsh history file: $ZSH_HISTORY_FILE ${reset_color}"
+    echo
     gpg -v -r $NAME --encrypt --sign --armor --output $ZSH_HISTORY_FILE_ENC $ZSH_HISTORY_FILE
-  fi
 
-  echo -n "Do you want to commit and push current local history file? "
-  read commit
+    if $?; then
+      echo -n "Do you want to commit current local history file? "
+      read commit
     
-  if [[ -n $commit ]]; then
-    case $commit in
-      [Yy]* ) 
-        git commit -am $ZSH_HISTORY_PROJ 
-        git push $ZSH_HISTORY_PROJ
+      if [[ -n $commit ]]; then
+        case $commit in
+          [Yy]* ) 
+            git commit -am $ZSH_HISTORY_PROJ 
+            git push $ZSH_HISTORY_PROJ
 
-        if [[ $? == 1 ]]; then 
-          echo "$fg_bold[red] Fix your git repo..." 
-        fi
-        break;;
-  #    [Nn]* )
-  #      exit;;
-  #    * )
-  #      exit;;
-    esac
+            if [[ $? == 1 ]]; then 
+              echo "$fg_bold[red] Fix your git repo..." 
+            fi
+            break;;
+          [Nn]* )
+            exit;;
+          * )
+            exit;;
+        esac
+      fi    
+    else
+      echo "fail"
+    fi
   fi
 }
 

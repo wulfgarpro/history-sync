@@ -1,6 +1,0 @@
-// encrypt
-
-gpg -r "James Fraser" --encrypt --sign --armor zsh_history_test
-
-//decrypt
-gpg --output test --decrypt zsh_history_test
