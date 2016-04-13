@@ -17,7 +17,6 @@ history-sync-push() {
 
   if [[ -n $FILE ]]; then
     echo "gpg'ing zsh history file: $ZSH_HISTORY_FILE"
-    # Encrypt history file for push
     gpg -v -r $NAME --encrypt --sign --armor --output $ZSH_HISTORY_FILE_ENC $ZSH_HISTORY_FILE
   fi
 
