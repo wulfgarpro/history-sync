@@ -1,11 +1,20 @@
+###
+# James Fraser
+# <wulfgar.pro@gmail.com>
+###
+
 autoload -U colors
 colors
+
+# Kill process group on SIGTERM
+#trap "trap - SIGTERM && kill -- -$$" SIGINT SIGTERM EXIT
 
 ZSH_HISTORY_FILE=$HOME/.zsh_history
 ZSH_HISTORY_PROJ=$HOME/.zsh_history_proj
 ZSH_HISTORY_FILE_ENC=$ZSH_HISTORY_PROJ/zsh_history
+GIT_COMMIT_MSG="latest $(date)"
 
-# backup; how about rotate?
+# Backup; how about rotate?
 cp -a $HOME/{.zsh_history,.zsh_history.backup}
 
 
@@ -19,38 +28,33 @@ history-sync-push() {
   read name
 
   if [[ -n $name ]]; then
-    echo
-    echo $bold_color$fg[green]"gpg'ing zsh history file: $ZSH_HISTORY_FILE ${reset_color}"
-    echo
     gpg -v -r $NAME --encrypt --sign --armor --output $ZSH_HISTORY_FILE_ENC $ZSH_HISTORY_FILE
 
-    if $?; then
-      echo -n "Do you want to commit current local history file? "
-      read commit
-    
-      if [[ -n $commit ]]; then
-        case $commit in
-          [Yy]* ) 
-            git commit -am $ZSH_HISTORY_PROJ 
-            git push $ZSH_HISTORY_PROJ
+    # Failed gpg
+    if [[ $? != 0 ]]; then
+      echo "$bold_color$fg[red]GPG failed to encrypt history file... exiting.${reset_color}"; return 
+    fi
 
-            if [[ $? == 1 ]]; then 
-              echo "$fg_bold[red] Fix your git repo..." 
-            fi
-            break;;
-          [Nn]* )
-            exit;;
-          * )
-            exit;;
-        esac
-      fi    
-    else
-      echo "fail"
+    echo -n "$bold_color$fg[yellow]Do you want to commit/push current local history file? ${reset_color}"
+    read commit    
+    if [[ -n $commit ]]; then
+      case $commit in
+        [Yy]* ) 
+          cd $ZSH_HISTORY_PROJ && git commit -am $GIT_COMMIT_MSG && git push
+          if [[ $? -ne 0 ]]; then 
+            echo "$bold_color$fg[red]Fix your git repo...${reset_color}"; return
+          fi
+          ;;
+        [Nn]* )
+          ;;
+        * )
+          ;;
+      esac          
     fi
   fi
 }
 
-# Simple function aliases
+# Function aliases
 alias hpl=history-sync-pull
 alias hps=history-sync-push
 
