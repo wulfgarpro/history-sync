@@ -1,20 +1,23 @@
-### An oh-my-zsh plugin for internet synced zsh_history
+## An oh-my-zsh plugin for gpg encrypted, internet synchronized zsh history using git.
+<br />
+That is, if you'd like an easy way to securely synchronise your zsh_history across many computers connected to the internet, this plugin will help you. You could even automate it using something like cron for a daily or even hourly sync.
 
-Design
-------
+### How do I  use it?
 
-1. command shortcut to sync current `history-sync {get,set}`, `hisync get, set`
-2. don't re-sync if no new changes
-3. some way of encrypting contents / transmission
-  3.1. pgp crypt hist file
-    3.1.1. this means generating pgp key option if missing from system
-    3.2.1. OR use a symmetric key
-  3.2. git push to exising or new repo (master)
-  3.2. overwrite existing history file at repo
-4. configurable,
-  4.1. setup hist file repo
-    4.1.1. can use existing repo
-  4.2. backup current history locally before re-sync (automatic)
-    4.2.1. re-instate back option `hisync --backup --revert`
-  4.3. work with current $HISTFILE or specified file `hisync --file /path/to/file`
+1. Create a git repo for housing your encrypted zsh_history file (local or remote)
+   - Mine is $HOME/.zsh_history_proj
+2. Activate history-sync plugin in your .zshrc
+   - git clone git@github.com:wulfgarpro/history-sync.git $HOME/.oh-my-zsh/plugins/.
+3. Export environment variables (or use defaults found in history-sync.plugin.zsh)
+   <br />These are:
+   - ZSH_HISTORY_FILE
+   - ZSH_HISTORY_PROJ
+   - ZSH_HISTORY_FILE_ENC
+   - GIT_COMMIT_MSG
+4. Ensure your gpg/pgp setup is complete and you have a public/private key pair
+   <br /> i.e.:
+   - gpg --list-keys
+5. Run zhpl alias to pull
+6. Run zhps alias to push
+7. Run zhsync to pull/push
 
