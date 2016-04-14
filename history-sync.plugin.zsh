@@ -55,6 +55,7 @@ history-sync-push() {
 }
 
 # Function aliases
-alias hpl=history-sync-pull
-alias hps=history-sync-push
+alias zhpl=history-sync-pull
+alias zhps=history-sync-push
+alias zhsync=history-sync-pull && history-sync-push
 
