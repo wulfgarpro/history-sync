@@ -17,9 +17,11 @@ function history-sync-pull() {
   cp -a $HOME/{.zsh_history,.zsh_history.backup}
   cd $ZSH_HISTORY_PROJ && git pull
   # Decrypt
-  gpg --output .zsh_history --decrypt zsh_history
+  gpg --output zsh_history_decrypted --decrypt zsh_history
   
   # Merge
+  cat $HOME/.zsh_history zsh_history_decrypted | sort -u > $HOME/.zsh_history 
+  rm zsh_history_decrypted
 }
 
 # Push current history to master
