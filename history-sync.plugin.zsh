@@ -6,24 +6,24 @@
 autoload -U colors
 colors
 
-# Kill process group on SIGTERM
-#trap "trap - SIGTERM && kill -- -$$" SIGINT SIGTERM EXIT
-
 ZSH_HISTORY_FILE=$HOME/.zsh_history
 ZSH_HISTORY_PROJ=$HOME/.zsh_history_proj
 ZSH_HISTORY_FILE_ENC=$ZSH_HISTORY_PROJ/zsh_history
 GIT_COMMIT_MSG="latest $(date)"
 
-# Backup; how about rotate?
-cp -a $HOME/{.zsh_history,.zsh_history.backup}
-
-
 # Pull down current history and merge; how to merge?
 function history-sync-pull() {
+  # Backup; how about rotate? better way?
+  cp -a $HOME/{.zsh_history,.zsh_history.backup}
+  cd $ZSH_HISTORY_PROJ && git pull
+  # Decrypt
+  gpg --output .zsh_history --decrypt zsh_history
+  
+  # Merge
 }
 
 # Push current history to master
-history-sync-push() {
+function history-sync-push() {
   echo -n "Please enter GPG recipient name: "
   read name
 
@@ -57,5 +57,5 @@ history-sync-push() {
 # Function aliases
 alias zhpl=history-sync-pull
 alias zhps=history-sync-push
-alias zhsync=history-sync-pull && history-sync-push
+alias zhsync="history-sync-pull && history-sync-push"
 
