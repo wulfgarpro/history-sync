@@ -30,6 +30,7 @@ function history_sync_pull() {
   cd $ZSH_HISTORY_PROJ && git pull
   if [[ $? != 0 ]]; then
     print_git_error_msg
+    cd $DIR
     return
   fi
 
@@ -37,6 +38,7 @@ function history_sync_pull() {
   gpg --output zsh_history_decrypted --decrypt zsh_history
   if [[ $? != 0 ]]; then
     print_gpg_decrypt_error_msg
+    cd $DIR
     return
   fi
 
@@ -71,14 +73,20 @@ function history_sync_push() {
           if [[ -n $push ]]; then
             case $push in
               [Yy]* )
-                git push            
+                git push                            
+                if [[ $? != 0 ]]; then 
+                  print_git_error_msg
+                  cd $DIR
+                  return
+                fi
+                cd $DIR
               ;;
             esac
           fi
 
-          cd $DIR
-          if [[ $? -ne 0 ]]; then 
+          if [[ $? != 0 ]]; then 
             print_git_error_msg
+            cd $DIR
             return
           fi
         ;;
