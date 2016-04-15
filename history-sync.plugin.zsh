@@ -11,30 +11,52 @@ ZSH_HISTORY_PROJ=$HOME/.zsh_history_proj
 ZSH_HISTORY_FILE_ENC=$ZSH_HISTORY_PROJ/zsh_history
 GIT_COMMIT_MSG="latest $(date)"
 
-# Pull down current history and merge; how to merge?
-function history-sync-pull() {
-  # Backup; how about rotate? better way?
+function print_git_error_msg() {
+  echo "$bold_color$fg[red]Fix your git repo...${reset_color}";
+}
+
+function print_gpg_encrypt_error_msg() {
+  echo "$bold_color$fg[red]GPG failed to encrypt history file... exiting.${reset_color}"; 
+}
+
+function print_gpg_decrypt_error_msg() {
+  echo "$bold_color$fg[red]GPG failed to decrypt history file... exiting.${reset_color}"; 
+}
+
+# Pull current master and merge with .zsh_history
+function history_sync_pull() {
   cp -a $HOME/{.zsh_history,.zsh_history.backup}
+  DIR=$CWD
   cd $ZSH_HISTORY_PROJ && git pull
+  if [[ $? != 0 ]]; then
+    print_git_error_msg
+    return
+  fi
+
   # Decrypt
   gpg --output zsh_history_decrypted --decrypt zsh_history
-  
-  # Merge
+  if [[ $? != 0 ]]; then
+    print_gpg_decrypt_error_msg
+    return
+  fi
+
+  # Merge using sort unique
   cat $HOME/.zsh_history zsh_history_decrypted | sort -u > $HOME/.zsh_history 
   rm zsh_history_decrypted
+  cd $DIR
 }
 
 # Push current history to master
-function history-sync-push() {
+function history_sync_push() {
   echo -n "Please enter GPG recipient name: "
   read name
 
+# Encrypt
   if [[ -n $name ]]; then
     gpg -v -r $NAME --encrypt --sign --armor --output $ZSH_HISTORY_FILE_ENC $ZSH_HISTORY_FILE
-
-    # Failed gpg
     if [[ $? != 0 ]]; then
-      echo "$bold_color$fg[red]GPG failed to encrypt history file... exiting.${reset_color}"; return 
+      print_gpg_encrypt_error_msg
+      return
     fi
 
     echo -n "$bold_color$fg[yellow]Do you want to commit/push current local history file? ${reset_color}"
@@ -42,9 +64,11 @@ function history-sync-push() {
     if [[ -n $commit ]]; then
       case $commit in
         [Yy]* ) 
-          cd $ZSH_HISTORY_PROJ && git commit -am $GIT_COMMIT_MSG && git push
+          DIR=$CWD
+          cd $ZSH_HISTORY_PROJ && git commit -am $GIT_COMMIT_MSG && git push $ZSH_HISTORY_PROJ && cd $DIR
           if [[ $? -ne 0 ]]; then 
-            echo "$bold_color$fg[red]Fix your git repo...${reset_color}"; return
+            print_git_error_msg
+            return
           fi
           ;;
         [Nn]* )
@@ -56,8 +80,7 @@ function history-sync-push() {
   fi
 }
 
-# Function aliases
-alias zhpl=history-sync-pull
-alias zhps=history-sync-push
-alias zhsync="history-sync-pull && history-sync-push"
+alias zhpl=history_sync_pull
+alias zhps=history_sync_push
+alias zhsync="history_sync_pull && history_sync_push"
 
