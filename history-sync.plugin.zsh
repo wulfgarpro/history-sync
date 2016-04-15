@@ -59,22 +59,32 @@ function history_sync_push() {
       return
     fi
 
-    echo -n "$bold_color$fg[yellow]Do you want to commit/push current local history file? ${reset_color}"
+    echo -n "$bold_color$fg[yellow]Do you want to commit current local history file? ${reset_color}"
     read commit    
     if [[ -n $commit ]]; then
       case $commit in
         [Yy]* ) 
           DIR=$CWD
-          cd $ZSH_HISTORY_PROJ && git commit -am $GIT_COMMIT_MSG && git push $ZSH_HISTORY_PROJ && cd $DIR
+          cd $ZSH_HISTORY_PROJ && git add * && git commit -am $GIT_COMMIT_MSG
+          echo -n "$bold_color$fg[yellow]Do you want to push to remote? ${reset_color}"
+          read push
+          if [[ -n $push ]]; then
+            case $push in
+              [Yy]* )
+                git push && cd $DIR            
+              ;;
+            esac
+          fi
+
           if [[ $? -ne 0 ]]; then 
             print_git_error_msg
             return
           fi
-          ;;
+        ;;
         [Nn]* )
-          ;;
+        ;;
         * )
-          ;;
+        ;;
       esac          
     fi
   fi
