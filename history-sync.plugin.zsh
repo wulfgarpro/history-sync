@@ -71,11 +71,12 @@ function history_sync_push() {
           if [[ -n $push ]]; then
             case $push in
               [Yy]* )
-                git push && cd $DIR            
+                git push            
               ;;
             esac
           fi
 
+          cd $DIR
           if [[ $? -ne 0 ]]; then 
             print_git_error_msg
             return
