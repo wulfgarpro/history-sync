@@ -31,4 +31,4 @@ history-sync uses Git to push/pull your zsh_history to/from a remote repository.
 
 ### Example use
 
-<a href="https://asciinema.org/a/43575" target="_blank"><img src="https://asciinema.org/a/43575.png" width="589"/></a>
+-![asciicast](asciicast.gif)
