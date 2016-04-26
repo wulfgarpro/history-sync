@@ -29,4 +29,4 @@ history-sync uses Git to push/pull your zsh_history to/from a remote repository.
 6. Run `zhps -r 876T3F78 -r 998A637B -r ...` to encrypt and push
 7. Run `zhsync` to pull/push
 
-<a href="https://asciinema.org/a/09tlikcnzlgi39oi4a5eihqnu" target="_blank"><img src="https://asciinema.org/a/09tlikcnzlgi39oi4a5eihqnu.png" width="800"/></a>
+<a href="https://asciinema.org/a/09tlikcnzlgi39oi4a5eihqnu" target="_blank"><img src="https://asciinema.org/a/09tlikcnzlgi39oi4a5eihqnu.png" width="400"/></a>
