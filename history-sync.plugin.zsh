@@ -35,6 +35,7 @@ function history_sync_pull() {
     # Backup
     cp -a $HOME/{.zsh_history,.zsh_history.backup}
     DIR=$CWD
+
     # Pull
     cd $ZSH_HISTORY_PROJ && git pull
     if [[ $? != 0 ]]; then
