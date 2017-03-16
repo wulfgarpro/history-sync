@@ -83,7 +83,7 @@ function history_sync_push() {
         recipients+=$name
     fi
 
-    ENCRYPT_CMD="gpg -v "
+    ENCRYPT_CMD="gpg --yes -v "
     for r in $recipients; do
         ENCRYPT_CMD+="-r \"$r\" "
     done
