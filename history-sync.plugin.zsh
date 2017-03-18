@@ -53,7 +53,7 @@ function history_sync_pull() {
     fi
 
     # Merge
-    cat $HOME/.zsh_history zsh_history_decrypted | sort -u > $HOME/.zsh_history 
+    cat $HOME/.zsh_history zsh_history_decrypted | awk '/:[0-9]/ { if(s) { print s } s=$0 } !/:[0-9]/ { s=s""$0 } END { print s }' | sort -u > $HOME/.zsh_history 
     rm zsh_history_decrypted
     cd $DIR
 }
@@ -102,7 +102,7 @@ function history_sync_push() {
             case $commit in
                 [Yy]* ) 
                     DIR=$CWD
-                    cd $ZSH_HISTORY_PROJ && git add * && git commit -am $GIT_COMMIT_MSG
+                    cd $ZSH_HISTORY_PROJ && git add * && git commit -m "$GIT_COMMIT_MSG"
                     echo -n "$bold_color$fg[yellow]Do you want to push to remote? ${reset_color}"
                     read push
                     if [[ -n $push ]]; then
