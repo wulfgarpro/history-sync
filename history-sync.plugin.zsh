@@ -6,9 +6,14 @@
 autoload -U colors
 colors
 
-ZSH_HISTORY_FILE=$HOME/.zsh_history
+ZSH_HISTORY_FILE_NAME=.zsh_history
+ZSH_HISTORY_FILE=$HOME/$ZSH_HISTORY_FILE_NAME
+
 ZSH_HISTORY_PROJ=$HOME/.zsh_history_proj
-ZSH_HISTORY_FILE_ENC=$ZSH_HISTORY_PROJ/zsh_history
+
+ZSH_HISTORY_FILE_DECRYPT_NAME=zsh_history_decrypted
+ZSH_HISTORY_FILE_ENC_NAME=zsh_history
+ZSH_HISTORY_FILE_ENC=$ZSH_HISTORY_PROJ/$ZSH_HISTORY_FILE_ENC_NAME
 GIT_COMMIT_MSG="latest $(date)"
 
 function print_git_error_msg() {
@@ -17,23 +22,24 @@ function print_git_error_msg() {
 }
 
 function print_gpg_encrypt_error_msg() {
-    echo "$bold_color$fg[red]GPG failed to encrypt history file... exiting.${reset_color}"; 
+    echo "$bold_color$fg[red]GPG failed to encrypt history file... exiting.${reset_color}";
     return;
 }
 
 function print_gpg_decrypt_error_msg() {
-    echo "$bold_color$fg[red]GPG failed to decrypt history file... exiting.${reset_color}"; 
-    return; 
+    echo "$bold_color$fg[red]GPG failed to decrypt history file... exiting.${reset_color}";
+    return;
 }
 
-function usage() { 
-    echo "$bold_color$fg[red]Usage: $0 [-r <string> -r <string>...]${reset_color}" 1>&2; return; 
+function usage() {
+    echo "$bold_color$fg[red]Usage: $0 [-r <string> -r <string>...]${reset_color}" 1>&2; return;
 }
 
 # Pull current master, decrypt, and merge with .zsh_history
 function history_sync_pull() {
     # Backup
-    cp -a $HOME/{.zsh_history,.zsh_history.backup}
+    echo "Backing up old history ""'""${ZSH_HISTORY_FILE}""'"" to ""'""${ZSH_HISTORY_FILE}.backup""'"
+    cp -a ${ZSH_HISTORY_FILE} ${ZSH_HISTORY_FILE}.backup
     DIR=$CWD
 
     # Pull
@@ -45,7 +51,7 @@ function history_sync_pull() {
     fi
 
     # Decrypt
-    gpg --output zsh_history_decrypted --decrypt zsh_history
+    gpg --output $ZSH_HISTORY_FILE_DECRYPT_NAME --decrypt $ZSH_HISTORY_FILE_ENC_NAME
     if [[ $? != 0 ]]; then
         print_gpg_decrypt_error_msg
         cd $DIR
@@ -53,8 +59,8 @@ function history_sync_pull() {
     fi
 
     # Merge
-    cat $HOME/.zsh_history zsh_history_decrypted | awk '/:[0-9]/ { if(s) { print s } s=$0 } !/:[0-9]/ { s=s""$0 } END { print s }' | sort -u > $HOME/.zsh_history 
-    rm zsh_history_decrypted
+    cat $ZSH_HISTORY_FILE $ZSH_HISTORY_FILE_DECRYPT_NAME | awk '/:[0-9]/ { if(s) { print s } s=$0 } !/:[0-9]/ { s=s""$0 } END { print s }' | sort -u > $ZSH_HISTORY_FILE
+    rm $ZSH_HISTORY_FILE_DECRYPT_NAME
     cd $DIR
 }
 
@@ -77,7 +83,7 @@ function history_sync_push() {
     echo $recipients
 
     # Encrypt
-    if ! [[ ${#recipients[@]} > 0 ]]; then      
+    if ! [[ ${#recipients[@]} > 0 ]]; then
         echo -n "Please enter GPG recipient name: "
         read name
         recipients+=$name
@@ -88,7 +94,7 @@ function history_sync_push() {
         ENCRYPT_CMD+="-r \"$r\" "
     done
 
-    if [[ $ENCRYPT_CMD =~ '.(-r).+.' ]]; then 
+    if [[ $ENCRYPT_CMD =~ '.(-r).+.' ]]; then
         ENCRYPT_CMD+="--encrypt --sign --armor --output $ZSH_HISTORY_FILE_ENC $ZSH_HISTORY_FILE"
         eval ${ENCRYPT_CMD}
         if [[ $? != 0 ]]; then
@@ -97,10 +103,10 @@ function history_sync_push() {
         fi
 
         echo -n "$bold_color$fg[yellow]Do you want to commit current local history file? ${reset_color}"
-        read commit    
+        read commit
         if [[ -n $commit ]]; then
             case $commit in
-                [Yy]* ) 
+                [Yy]* )
                     DIR=$CWD
                     cd $ZSH_HISTORY_PROJ && git add * && git commit -m "$GIT_COMMIT_MSG"
                     echo -n "$bold_color$fg[yellow]Do you want to push to remote? ${reset_color}"
@@ -108,8 +114,8 @@ function history_sync_push() {
                     if [[ -n $push ]]; then
                         case $push in
                             [Yy]* )
-                                git push                            
-                                if [[ $? != 0 ]]; then 
+                                git push
+                                if [[ $? != 0 ]]; then
                                     print_git_error_msg
                                     cd $DIR
                                     return
@@ -119,7 +125,7 @@ function history_sync_push() {
                         esac
                     fi
 
-                    if [[ $? != 0 ]]; then 
+                    if [[ $? != 0 ]]; then
                         print_git_error_msg
                         cd $DIR
                         return
@@ -129,7 +135,7 @@ function history_sync_push() {
                     ;;
                 * )
                     ;;
-            esac          
+            esac
         fi
     fi
 }
