@@ -1,33 +1,64 @@
-# An Oh My Zsh plugin for GPG encrypted, Internet synchronized Zsh history using Git  
+# history-sync
+> An Oh My Zsh plugin for GPG encrypted, Internet synchronized Zsh history using Git.
 
-That is, if you'd like an easy way to securely synchronise your zsh_history across many computers connected to the Internet, this plugin will help you. **Be creative with this - I dare you.**
+## Installation
+```bash
+sudo apt install gpg git
+git clone git@github.com:wulfgarpro/history-sync.git
+cp -r history-sync ~/.oh-my-zsh/plugins
+```
 
-## What tooling do I need?
-1. GnuPG  
-history-sync uses GPG to encrypt/decrypt your zsh_history. The [GnuPG documentation](https://www.gnupg.org/documentation/manuals.html) is very good.
+Then open .zshrc file and append history-sync to the plugin line:
 
-2. Git  
-history-sync uses Git to push/pull your zsh_history to/from a remote repository.  
+```bash
+plugins=(... history-sync)
+```
 
-## How do I  use it?
-1. Create a Git repo for housing your encrypted zsh_history file. This repo needs to be accessible from all client shells you'd like to synchronize
-   - Mine is *$HOME/.zsh_history_proj*
-2. Activate history-sync plugin in your *.zshrc*
-   - `git clone git@github.com:wulfgarpro/history-sync.git $HOME/.oh-my-zsh/plugins/.`
-3. Export environment variables (or use defaults found in the plugin file history-sync.plugin.zsh)  
-   These are:
-   - **ZSH_HISTORY_FILE**  
-   Your zsh_history file location
-   - **ZSH_HISTORY_PROJ**  
-   Your Git project for housing your zsh_history file
-   - **ZSH_HISTORY_FILE_ENC**  
-   Your encrypted zsh_history file location
-   - **GIT_COMMIT_MSG**  
-   Your default message when pushing to *$ZSH_HISTORY_PROJ*
-4. Ensure your GPG setup is complete and you have a public/private key pair for encrypting/decrypting: `man gpg`
-5. Run `zhpl` to pull
-6. Run `zhps -r 876T3F78 -r 998A637B -r ...` to encrypt and push
-7. Run `zhsync` to pull/push
+And finally, reload zsh:
 
-## Example use
-- [https://asciinema.org/a/43575](https://asciinema.org/a/43575)
+```bash
+source ~/.zshrc
+```
+
+## Usage
+Before history-sync can be useful, you need two things:
+
+1. A hosted git repository, e.g. GitHub, Bitbucket
+   * Ideally with ssh key access
+2. A configured gpg key pair for encrypting and decrypting your history file
+   * See [the GnuPG documentation](https://www.gnupg.org/documentation/) for more information
+
+Once you have these things in place, it's just a matter of updating the needed environment variables to suit your configuration:
+
+* ZSH_HISTORY_FILE: your zsh_history file location
+* ZSH_HISTORY_PROJ: your git project for housing your zsh_history file
+* ZSH_HISTORY_FILE_ENC: your encrypted zsh_history file location
+* GIT_COMMIT_MSG: your default message when pushing to $ZSH_HISTORY_PROJ
+
+Which have the following defaults:
+
+```bash
+ZSH_HISTORY_FILE_NAME=".zsh_history"
+ZSH_HISTORY_FILE="${HOME}/${ZSH_HISTORY_FILE_NAME}"
+ZSH_HISTORY_PROJ="${HOME}/.zsh_history_proj"
+ZSH_HISTORY_FILE_ENC_NAME="zsh_history"
+ZSH_HISTORY_FILE_ENC="${ZSH_HISTORY_PROJ}/${ZSH_HISTORY_FILE_ENC_NAME}"
+GIT_COMMIT_MSG="latest $(date)"
+```
+
+and running the commands:
+
+```bash
+# pull history
+zhpl
+
+# push history
+zhps -r "John Brown"
+
+# pull and push history
+zhsync
+```
+
+## Licence
+MIT @ [James Fraser](https://www.wulfgar.pro)
+
