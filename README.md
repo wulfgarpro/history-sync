@@ -53,12 +53,14 @@ and running the commands:
 zhpl
 
 # push history
-zhps -r "John Brown"
+zhps -r "John Brown" -r 876T3F78 -r ...
 
 # pull and push history
 zhsync
 ```
 
+## Demo
+Check out the [screen cast](https://asciinema.org/a/43575).
+
 ## Licence
 MIT @ [James Fraser](https://www.wulfgar.pro)
-
