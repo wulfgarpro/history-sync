@@ -17,7 +17,7 @@ plugins=(... history-sync)
 And finally, reload zsh:
 
 ```bash
-source ~/.zshrc
+zsh
 ```
 
 ## Usage
