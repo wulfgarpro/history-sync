@@ -25,8 +25,8 @@ Before history-sync can be useful, you need two things:
 
 1. A hosted git repository, e.g. GitHub, Bitbucket
    * Ideally with ssh key access
-2. A configured gpg key pair for encrypting and decrypting your history file
-   * See [the GnuPG documentation](https://www.gnupg.org/documentation/) for more information
+2. A configured gpg key pair for encrypting and decrypting your history file and the enrolled public keys of all the nodes in your web of trust
+   * See [the GnuPG documentation](https://www.gnupg.org/documentation/) for more information since it's outside the scope of this README
 
 Once you have these things in place, it's just a matter of updating the needed environment variables to suit your configuration:
 
