@@ -11,9 +11,8 @@
 # * James Fraser <wulfgar.pro@gmail.com>
 #   https://www.wulfgar.pro
 # ----------------------------------------------------------------
-
-autoload -U colors
-colors
+#
+autoload -U colors && colors
 
 alias zhpl=history_sync_pull
 alias zhps=history_sync_push
