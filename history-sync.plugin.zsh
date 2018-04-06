@@ -55,7 +55,7 @@ function history_sync_pull() {
 
     # Backup
     cp -av "$ZSH_HISTORY_FILE" "$ZSH_HISTORY_FILE.backup" 1>&2
-    
+
     # Pull
     cd "$ZSH_HISTORY_PROJ" && "$GIT" pull
     if [[ "$?" != 0 ]]; then
@@ -63,7 +63,7 @@ function history_sync_pull() {
         cd "$DIR"
         return
     fi
-    
+
     # Decrypt
     "$GPG" --output "$ZSH_HISTORY_FILE_DECRYPT_NAME" --decrypt "$ZSH_HISTORY_FILE_ENC"
     if [[ "$?" != 0 ]]; then
@@ -71,7 +71,7 @@ function history_sync_pull() {
         cd "$DIR"
         return
     fi
-    
+
     # Merge
     cat "$ZSH_HISTORY_FILE" "$ZSH_HISTORY_FILE_DECRYPT_NAME" | awk '/:[0-9]/ { if(s) { print s } s=$0 } !/:[0-9]/ { s=s"\n"$0 } END { print s }' | sort -u > "$ZSH_HISTORY_FILE"
     rm  "$ZSH_HISTORY_FILE_DECRYPT_NAME"
@@ -82,10 +82,14 @@ function history_sync_pull() {
 function history_sync_push() {
     # Get option recipients
     local recipients=()
-    while getopts -r: opt; do
+    local force=false
+    while getopts yr: opt; do
         case "$opt" in
             r)
                 recipients+="$OPTARG"
+                ;;
+            y)
+                force=true
                 ;;
             *)
                 _usage
@@ -93,7 +97,7 @@ function history_sync_push() {
                 ;;
         esac
     done
-    
+
     # Encrypt
     if ! [[ "${#recipients[@]}" > 0 ]]; then
         echo -n "Please enter GPG recipient name: "
@@ -111,17 +115,28 @@ function history_sync_push() {
             _print_gpg_encrypt_error_msg
             return
         fi
-    
+
         # Commit
-        echo -n "$bold_color${fg[yellow]}Do you want to commit current local history file (y/N)?$reset_color "
-        read commit
+        if [[ $force = false ]]; then
+            echo -n "$bold_color${fg[yellow]}Do you want to commit current local history file (y/N)?$reset_color "
+            read commit
+        else
+            commit='y'
+        fi
+
         if [[ -n "$commit" ]]; then
             case "$commit" in
                 [Yy]* )
                     DIR=$(pwd)
                     cd "$ZSH_HISTORY_PROJ" && "$GIT" add * && "$GIT" commit -m "$GIT_COMMIT_MSG"
-                    echo -n "$bold_color${fg[yellow]}Do you want to push to remote (y/N)?$reset_color "
-                    read push
+
+                    if [[ $force = false ]]; then
+                        echo -n "$bold_color${fg[yellow]}Do you want to push to remote (y/N)?$reset_color "
+                        read push
+                    else
+                        push='y'
+                    fi
+
                     if [[ -n "$push" ]]; then
                         case "$push" in
                             [Yy]* )
