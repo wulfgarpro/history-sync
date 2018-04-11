@@ -45,7 +45,12 @@ function _print_gpg_decrypt_error_msg() {
 }
 
 function _usage() {
-    echo "$bold_color${fg[red]}Usage: $0 [-r <string> -r <string>...]$reset_color" 1>&2
+    echo "Usage: [ [-r <string> ...] [-y] ]" 1>&2
+    echo
+    echo "Optional args:"
+    echo
+    echo "      -r receipients"
+    echo "      -y force"
     return
 }
 
@@ -80,10 +85,10 @@ function history_sync_pull() {
 
 # Encrypt and push current history to master
 function history_sync_push() {
-    # Get option recipients
+    # Get options recipients, force
     local recipients=()
     local force=false
-    while getopts yr: opt; do
+    while getopts r:y opt; do
         case "$opt" in
             r)
                 recipients+="$OPTARG"
@@ -104,10 +109,12 @@ function history_sync_push() {
         read name
         recipients+="$name"
     fi
+
     ENCRYPT_CMD="$GPG --yes -v "
     for r in "${recipients[@]}"; do
         ENCRYPT_CMD+="-r \"$r\" "
     done
+
     if [[ "$ENCRYPT_CMD" =~ '.(-r).+.' ]]; then
         ENCRYPT_CMD+="--encrypt --sign --armor --output $ZSH_HISTORY_FILE_ENC $ZSH_HISTORY_FILE"
         eval "$ENCRYPT_CMD"
@@ -150,6 +157,7 @@ function history_sync_push() {
                                 ;;
                         esac
                     fi
+
                     if [[ "$?" != 0 ]]; then
                         _print_git_error_msg
                         cd "$DIR"
