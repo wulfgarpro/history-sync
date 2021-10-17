@@ -115,6 +115,9 @@ function _restore_multiline_commands_in_file() {
     # Replace the sequence of symbols by \n to restore multi-line commands
     sed "s/ ${NL_REPLACEMENT} /\n/g" "$ZSH_HISTORY_FILE" > "${TMP_FILE_1}" \
         && mv "${TMP_FILE_1}" "$ZSH_HISTORY_FILE"
+
+    # Unset global variables
+    unset NL_REPLACEMENT TMP_FILE_1 TMP_FILE_2
 }
 
 # Pull current master, decrypt, and merge with .zsh_history
