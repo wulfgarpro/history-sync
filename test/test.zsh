@@ -26,7 +26,7 @@ function check_fn_exists() {
     [[ $? -eq 0 ]] || {failure "FAILURE: Function '$1' missing"; exit $?}
 }
 
-function check_alais_exists() {
+function check_alias_exists() {
     alias "$1" >/dev/null
     [[ $? -eq 0 ]] || {failure "FAILURE: Alias '$1' missing"; exit $?}
 }
@@ -37,7 +37,7 @@ function check_env_exists() {
 }
 
 function check_history() {
-    grep "$1" ~/.zsh_history >> /dev/null
+    rg -U "$1" ~/.zsh_history >/dev/null
     [[ $? -eq 0 ]] || {failure "FAILURE: History did not match '$1'"; exit $?}
 }
 
@@ -94,10 +94,19 @@ echo "2 echo $RAND1" >> ~/.zsh_history
 echo "3 echo $RAND2" >> ~/.zsh_history
 echo "4 echo $RAND3" >> ~/.zsh_history
 echo "5 echo $RAND4" >> ~/.zsh_history
-echo "$UID" | zhps -y && zhpl -y
+zhps -y -r $UID && zhpl -y
 check_history "^1 echo $RAND0$"
 check_history "^2 echo $RAND1$"
 check_history "^3 echo $RAND2$"
 check_history "^4 echo $RAND3$"
 check_history "^5 echo $RAND4$"
+success "SUCCESS"
+
+info "TEST SYNC HISTORY MULTI-LINE 0"
+setup
+echo "1 for i in {1..3}; do
+echo \$i
+done" >> ~/.zsh_history
+zhps -y -r $UID && zhpl -y
+check_history "^1 for i in \{1..3\}; do\necho \\\$i\ndone$"
 success "SUCCESS"

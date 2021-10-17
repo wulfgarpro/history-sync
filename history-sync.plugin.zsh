@@ -54,6 +54,69 @@ function _usage() {
     return
 }
 
+# "Squash" each multi-line command in the passed history files to one line
+function _squash_multiline_commands_in_files() {
+    # Create temporary files
+    # Use global variables to use same path's in the restore-multi-line commands
+    # function
+    TMP_FILE_1=$(mktemp)
+    TMP_FILE_2=$(mktemp)
+
+    # Generate random character sequences to replace \n and anchor the first
+    # line of a command (use global variable for new-line-replacement to use it
+    # in the restore-multi-line commands function)
+    NL_REPLACEMENT=$(tr -dc 'a-zA-Z0-9' < /dev/urandom |
+        fold -w 32 | head -n 1)
+    local FIRST_LINE_ANCHOR=$(tr -dc 'a-zA-Z0-9' < /dev/urandom |
+        fold -w 32 | head -n 1)
+
+    for i in "$ZSH_HISTORY_FILE" "$ZSH_HISTORY_FILE_DECRYPT_NAME"; do
+        # Filter out multi-line commands and save them to a separate file
+        grep -v -B 1 '^: [0-9]\{1,10\}:[0-9]\+;' "${i}" |
+            grep -v -e '^--$' > "${TMP_FILE_1}"
+
+        # Filter out multi-line commands and remove them from the original file
+        grep -v -x -F -f "${TMP_FILE_1}" "${i}" > "${TMP_FILE_2}" \
+            && mv "${TMP_FILE_2}" "${i}"
+
+        # Add anchor before the first line of each command
+        sed "s/\(^: [0-9]\{1,10\}:[0-9]\+;\)/${FIRST_LINE_ANCHOR} \1/" \
+            "${TMP_FILE_1}" > "${TMP_FILE_2}" \
+            && mv "${TMP_FILE_2}" "${TMP_FILE_1}"
+
+        # Replace all \n with a sequence of symbols
+        sed ':a;N;$!ba;s/\n/'" ${NL_REPLACEMENT} "'/g' \
+            "${TMP_FILE_1}" > "${TMP_FILE_2}" \
+            && mv "${TMP_FILE_2}" "${TMP_FILE_1}"
+
+        # Replace first line anchor by \n
+        sed "s/${FIRST_LINE_ANCHOR} \(: [0-9]\{1,10\}:[0-9]\+;\)/\n\1/g" \
+            "${TMP_FILE_1}" > "${TMP_FILE_2}" \
+            && mv "${TMP_FILE_2}" "${TMP_FILE_1}"
+
+        # Merge squashed multiline commands to the history file
+        cat "${TMP_FILE_1}" >> "${i}"
+
+        # Sort history file
+        sort -n < "${i}" > "${TMP_FILE_1}" && mv "${TMP_FILE_1}" "${i}"
+    done
+}
+
+# Restore multi-line commands in the history file
+function _restore_multiline_commands_in_file() {
+    # Filter unnecessary lines from the history file (Binary file ... matches)
+    # and save them in a separate file
+    grep -v '^: [0-9]\{1,10\}:[0-9]\+;' "$ZSH_HISTORY_FILE" > "${TMP_FILE_1}"
+
+    # Filter out unnecessary lines and remove them from the original file
+    grep -v -x -F -f "${TMP_FILE_1}" "$ZSH_HISTORY_FILE" > "${TMP_FILE_2}" && \
+        mv "${TMP_FILE_2}" "$ZSH_HISTORY_FILE"
+
+    # Replace the sequence of symbols by \n to restore multi-line commands
+    sed "s/ ${NL_REPLACEMENT} /\n/g" "$ZSH_HISTORY_FILE" > "${TMP_FILE_1}" \
+        && mv "${TMP_FILE_1}" "$ZSH_HISTORY_FILE"
+}
+
 # Pull current master, decrypt, and merge with .zsh_history
 function history_sync_pull() {
     # Get options force
@@ -88,10 +151,18 @@ function history_sync_pull() {
         return
     fi
 
+    # Check if EXTENDED_HISTORY is enabled, and if so, "squash" each multi-line
+    # command in local and decrypted history files to one line
+    [[ -o extendedhistory ]] && _squash_multiline_commands_in_files
+
     # Merge
     cat "$ZSH_HISTORY_FILE" "$ZSH_HISTORY_FILE_DECRYPT_NAME" | awk '/:[0-9]/ { if(s) { print s } s=$0 } !/:[0-9]/ { s=s"\n"$0 } END { print s }' | LC_ALL=C sort -u > "$ZSH_HISTORY_FILE"
     rm  "$ZSH_HISTORY_FILE_DECRYPT_NAME"
     cd  "$DIR"
+
+    # Check if EXTENDED_HISTORY is enabled, and if so, restore multi-line
+    # commands in the local history file
+    [[ -o extendedhistory ]] && _restore_multiline_commands_in_file
 }
 
 # Encrypt and push current history to master

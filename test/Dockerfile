@@ -3,9 +3,10 @@ FROM ubuntu:latest
 # Install system packages
 RUN apt-get update && apt-get install -y \
     curl \
-    git  \
-    zsh  \
-    gpg
+    git \
+    zsh \
+    gpg \
+    ripgrep
 # Install oh-my-zsh
 RUN sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)"
 
