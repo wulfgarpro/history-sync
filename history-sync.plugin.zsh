@@ -21,13 +21,13 @@ alias zhsync="history_sync_pull && history_sync_push"
 GIT=$(which git)
 GPG=$(which gpg)
 
-ZSH_HISTORY_PROJ="${HOME}/.zsh_history_proj"
-ZSH_HISTORY_FILE_NAME=".zsh_history"
-ZSH_HISTORY_FILE="${HOME}/${ZSH_HISTORY_FILE_NAME}"
-ZSH_HISTORY_FILE_ENC_NAME="zsh_history"
-ZSH_HISTORY_FILE_ENC="${ZSH_HISTORY_PROJ}/${ZSH_HISTORY_FILE_ENC_NAME}"
-ZSH_HISTORY_FILE_DECRYPT_NAME="zsh_history_decrypted"
-GIT_COMMIT_MSG="latest $(date)"
+ZSH_HISTORY_PROJ="${ZSH_HISTORY_PROJ:-${HOME}/.zsh_history_proj}"
+ZSH_HISTORY_FILE_NAME="${ZSH_HISTORY_FILE_NAME:-.zsh_history}"
+ZSH_HISTORY_FILE="${ZSH_HISTORY_FILE:-${HOME}/${ZSH_HISTORY_FILE_NAME}}"
+ZSH_HISTORY_FILE_ENC_NAME="${ZSH_HISTORY_FILE_ENC_NAME:-zsh_history}"
+ZSH_HISTORY_FILE_ENC="${ZSH_HISTORY_FILE_ENC:-${ZSH_HISTORY_PROJ}/${ZSH_HISTORY_FILE_ENC_NAME}}"
+ZSH_HISTORY_FILE_DECRYPT_NAME="${ZSH_HISTORY_FILE_DECRYPT_NAME:-zsh_history_decrypted}"
+ZSH_HISTORY_COMMIT_MSG="${ZSH_HISTORY_COMMIT_MSG:-latest $(date)}"
 
 function _print_git_error_msg() {
     echo "$bold_color${fg[red]}There's a problem with git repository: ${ZSH_HISTORY_PROJ}.$reset_color"
@@ -135,7 +135,7 @@ function history_sync_push() {
             case "$commit" in
                 [Yy]* )
                     DIR=$(pwd)
-                    cd "$ZSH_HISTORY_PROJ" && "$GIT" add * && "$GIT" commit -m "$GIT_COMMIT_MSG"
+                    cd "$ZSH_HISTORY_PROJ" && "$GIT" add * && "$GIT" commit -m "$ZSH_HISTORY_COMMIT_MSG"
 
                     if [[ $force = false ]]; then
                         echo -n "$bold_color${fg[yellow]}Do you want to push to remote (y/N)?$reset_color "
