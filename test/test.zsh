@@ -37,7 +37,7 @@ echo "TEST ENVIRONMENT VARIABLES EXIST"
 check_env_exists ZSH_HISTORY_FILE
 check_env_exists ZSH_HISTORY_PROJ
 check_env_exists ZSH_HISTORY_FILE_ENC
-check_env_exists GIT_COMMIT_MSG
+check_env_exists ZSH_HISTORY_COMMIT_MSG
 echo "SUCCESS"
 
 echo "TEST SYNC HISTORY"
