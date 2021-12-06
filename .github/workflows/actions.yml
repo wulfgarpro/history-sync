@@ -1,7 +1,7 @@
 name: history-sync
 on: [push]
 jobs:
-  setup:
+  setup_and_test:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2

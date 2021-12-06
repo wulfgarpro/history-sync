@@ -12,7 +12,7 @@ RUN sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master
 RUN mkdir -p /root/.oh-my-zsh/plugins/history-sync
 COPY history-sync.plugin.zsh /root/.oh-my-zsh/plugins/history-sync/
 COPY test/zshrc /root/.zshrc
-COPY test/test.zsh /root/test.zsh
-RUN chmod +x /root/test.zsh
+COPY test/test*.zsh /root
+RUN chmod +x /root/test*.zsh
 
-ENTRYPOINT ["/bin/zsh", "-c", "/root/test.zsh"]
+ENTRYPOINT ["/bin/zsh", "-c", "/root/test*.zsh"]
