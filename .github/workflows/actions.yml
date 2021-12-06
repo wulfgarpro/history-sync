@@ -1,0 +1,8 @@
+name: history-sync
+on: [push]
+jobs:
+  setup:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - run: docker build . --file test/Dockerfile --tag history-sync-test:$(date +%s)
