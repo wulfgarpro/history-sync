@@ -5,4 +5,5 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
-      - run: docker build . --file test/Dockerfile --tag history-sync-test:$(date +%s)
+      - run: docker build . --file test/Dockerfile --tag history-sync-test:latest
+      - run: docker run history-sync-test:latest; exit $?
