@@ -1,11 +1,15 @@
 #!/usr/bin/env zsh
 
-set -e
+function check_fn_exists() {
+    typeset -f $1 >/dev/null
+    [[ $? -eq 0 ]] || (echo "Function $1 missing"; exit $?)
+}
 
-# Test history-sync functions exist
-typeset -f _print_git_error_msg 2>/dev/null
-typeset -f _print_gpg_encrypt_error_msg 2>/dev/null
-typeset -f _print_gpg_decrypt_error_msg 2>/dev/null
-typeset -f _usage 2>/dev/null
-typeset -f history_sync_pull 2>/dev/null
-typeset -f history_sync_push 2>/dev/null
+echo "Test history-sync functions exist"
+check_fn_exists _print_git_error_msg
+check_fn_exists _print_gpg_encrypt_error_msg
+check_fn_exists _print_gpg_decrypt_error_msg
+check_fn_exists _usage
+check_fn_exists history_sync_pull
+check_fn_exists history_sync_push
+echo "Success"
