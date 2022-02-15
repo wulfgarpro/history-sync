@@ -164,11 +164,15 @@ function history_sync_pull() {
 function history_sync_push() {
     # Get options recipients, force
     local recipients=()
+    local signers=()
     local force=false
-    while getopts r:y opt; do
+    while getopts r:s:y opt; do
         case "$opt" in
             r)
                 recipients+="$OPTARG"
+                ;;
+            s)
+                signers+="$OPTARG"
                 ;;
             y)
                 force=true
@@ -191,9 +195,34 @@ function history_sync_push() {
     for r in "${recipients[@]}"; do
         ENCRYPT_CMD+="-r \"$r\" "
     done
+    if [[ "${#signers[@]}" > 0 ]]; then
+        ENCRYPT_CMD+="--sign "
+        for s in "${signers[@]}"; do
+            ENCRYPT_CMD+="--default-key \"$s\" "
+        done
+    fi
+
+    if [[ "$ENCRYPT_CMD" != *"--sign"* ]]; then
+        if [[ $force = false ]]; then
+            echo -n "$bold_color${fg[yellow]}Do you want to sign with first key found in secret keyring (y/N)?$reset_color "
+            read sign
+        else
+            sign='y'
+        fi
+    fi
+
+    if [[ -n "$sign" ]]; then
+        case "$sign" in
+            [Yy]* )
+                    ENCRYPT_CMD+="--sign "
+                    ;;
+                * )
+                    ;;
+        esac
+    fi
 
     if [[ "$ENCRYPT_CMD" =~ '.(-r).+.' ]]; then
-        ENCRYPT_CMD+="--encrypt --sign --armor --output $ZSH_HISTORY_FILE_ENC $ZSH_HISTORY_FILE"
+        ENCRYPT_CMD+="--encrypt --armor --output $ZSH_HISTORY_FILE_ENC $ZSH_HISTORY_FILE"
         eval "$ENCRYPT_CMD"
         if [[ "$?" != 0 ]]; then
             _print_gpg_encrypt_error_msg
