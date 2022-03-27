@@ -25,3 +25,8 @@ check_env_exists ZSH_HISTORY_PROJ
 check_env_exists ZSH_HISTORY_FILE_ENC
 check_env_exists GIT_COMMIT_MSG
 echo "SUCCESS"
+
+echo "TEST SYNC HISTORY"
+git clone https://${{ secrets.ACCESS_KEY }}@github.com/wulfgarpro/history-sync-test ~/.zsh_history_proj
+[[ -d ~/.zsh_history_proj ]]
+echo "SUCCESS"
