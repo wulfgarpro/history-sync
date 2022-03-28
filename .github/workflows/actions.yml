@@ -7,5 +7,5 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
-      - run: docker build . --file test/Dockerfile --build-arg access_key=${ACCESS_KEY} --tag history-sync-test:latest
+      - run: docker build . --file test/Dockerfile --build-arg ACCESS_KEY=${ACCESS_KEY} --tag history-sync-test:latest
       - run: docker run history-sync-test:latest; exit $?
