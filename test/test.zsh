@@ -1,5 +1,7 @@
 #!/usr/bin/env zsh
 
+ACCESS_KEY=$1
+
 function check_fn_exists() {
     typeset -f $1 >/dev/null
     [[ $? -eq 0 ]] || {echo "FAILURE: Function $1 missing"; exit $?}
@@ -27,6 +29,6 @@ check_env_exists GIT_COMMIT_MSG
 echo "SUCCESS"
 
 echo "TEST SYNC HISTORY"
-git clone https://${{ secrets.ACCESS_KEY }}@github.com/wulfgarpro/history-sync-test ~/.zsh_history_proj
+git clone "https://$ACCESS_KEY@github.com/wulfgarpro/history-sync-test" ~/.zsh_history_proj
 [[ -d ~/.zsh_history_proj ]]
 echo "SUCCESS"
