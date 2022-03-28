@@ -17,4 +17,4 @@ COPY test/zshrc /root/.zshrc
 COPY test/test.zsh /root
 RUN chmod +x /root/test.zsh
 
-ENTRYPOINT ["/bin/zsh", "-i", "/root/test.zsh", $ACCESS_KEY]
+ENTRYPOINT ["/usr/bin/zsh", "-i", "/root/test.zsh", $ACCESS_KEY]
