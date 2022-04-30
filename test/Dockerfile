@@ -1,7 +1,5 @@
 FROM ubuntu:latest
 
-ARG ACCESS_KEY
-
 # Install system packages
 RUN apt-get update && apt-get install -y \
     curl \
@@ -17,4 +15,6 @@ COPY test/zshrc /root/.zshrc
 COPY test/test.zsh /root
 RUN chmod +x /root/test.zsh
 
-ENTRYPOINT ["/usr/bin/zsh", "-i", "/root/test.zsh", $ACCESS_KEY]
+ARG ACCESS_KEY
+ENV ACCESS_KEY=${ACCESS_KEY}
+ENTRYPOINT /usr/bin/zsh -i /root/test.zsh $ACCESS_KEY
