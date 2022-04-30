@@ -56,10 +56,21 @@ function _usage() {
 
 # Pull current master, decrypt, and merge with .zsh_history
 function history_sync_pull() {
+    # Get options force
+    local force=false
+    while getopts y opt; do
+        case "$opt" in
+            y)
+                force=true
+                ;;
+        esac
+    done
     DIR=$(pwd)
 
     # Backup
-    cp -av "$ZSH_HISTORY_FILE" "$ZSH_HISTORY_FILE.backup" 1>&2
+    if [[ $force = false ]]; then
+        cp -av "$ZSH_HISTORY_FILE" "$ZSH_HISTORY_FILE.backup" 1>&2
+    fi
 
     # Pull
     cd "$ZSH_HISTORY_PROJ" && "$GIT" pull

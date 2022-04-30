@@ -1,0 +1,11 @@
+name: history-sync
+env:
+  ACCESS_KEY: ${{ secrets.ACCESS_KEY }}
+on: [push]
+jobs:
+  setup_and_test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - run: docker build . --file test/Dockerfile --build-arg ACCESS_KEY=${ACCESS_KEY} --tag test/history-sync:latest
+      - run: docker run test/history-sync:latest; exit $?
