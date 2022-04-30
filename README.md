@@ -1,3 +1,5 @@
+[![history-sync](https://github.com/wulfgarpro/history-sync/actions/workflows/actions.yml/badge.svg)](https://github.com/wulfgarpro/history-sync/actions/workflows/actions.yml)
+
 # history-sync
 > An Oh My Zsh plugin for GPG encrypted, Internet synchronized Zsh history using Git.
 
