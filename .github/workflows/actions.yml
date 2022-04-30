@@ -8,4 +8,4 @@ jobs:
     steps:
       - uses: actions/checkout@v2
       - run: docker build . --file test/Dockerfile --build-arg ACCESS_KEY=${ACCESS_KEY} --tag test/history-sync:latest
-      - run: docker run history-sync-test:latest; exit $?
+      - run: docker run test/history-sync:latest; exit $?
