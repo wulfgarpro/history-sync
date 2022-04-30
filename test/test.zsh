@@ -4,12 +4,17 @@ ACCESS_KEY=$1
 
 function check_fn_exists() {
     typeset -f $1 >/dev/null
-    [[ $? -eq 0 ]] || {echo "FAILURE: Function $1 missing"; exit $?}
+    [[ $? -eq 0 ]] || {echo "FAILURE: Function '$1' missing"; exit $?}
 }
 
 function check_env_exists() {
     [[ -v $1 ]]
-    [[ $? -eq 0 ]] || {echo "FAILURE: Environment variable $1 missing"; exit $?}
+    [[ $? -eq 0 ]] || {echo "FAILURE: Environment variable '$1' missing"; exit $?}
+}
+
+function check_history() {
+    grep $1 ~/.zsh_history >> /dev/null
+    [[ $? -eq 0 ]] || {echo "FAILURE: History did not match '$1'"; exit $?}
 }
 
 echo "TEST HISTORY-SYNC FUNCTIONS EXIST"
@@ -32,10 +37,11 @@ echo "TEST SYNC HISTORY"
 git clone "https://$ACCESS_KEY@github.com/wulfgarpro/history-sync-test" ~/.zsh_history_proj
 [[ -d ~/.zsh_history_proj ]]
 gpg --quick-gen-key --yes --batch --passphrase '' $UID
-echo "1 cd ~" >> ~/.zsh_history
-gpg -r $UID -e ~/.zsh_history
-cd ~/.zsh_history_proj
-mv ~/.zsh_history.gpg .
-git -c user.name='James Fraser' -c user.email='wulfgar.pro@gmail.com' commit -am "Added encrypted history"
-git push "https://$ACCESS_KEY@github.com/wulfgarpro/history-sync-test"
+git config --global user.name "James Fraser"
+git config --global user.email "wulfgar.pro@gmail.com"
+RAND=$RANDOM
+echo "1 echo $RAND" >> ~/.zsh_history
+echo "$UID" | zhps -y
+zhpl -y
+check_history "^1 echo $RAND$"
 echo "SUCCESS"
