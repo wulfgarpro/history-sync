@@ -31,4 +31,11 @@ echo "SUCCESS"
 echo "TEST SYNC HISTORY"
 git clone "https://$ACCESS_KEY@github.com/wulfgarpro/history-sync-test" ~/.zsh_history_proj
 [[ -d ~/.zsh_history_proj ]]
+gpg --quick-gen-key --yes --batch --passphrase '' $UID
+echo "1 cd ~" >> ~/.zsh_history
+gpg -r $UID -e ~/.zsh_history
+cd ~/.zsh_history_proj
+mv ~/.zsh_history.gpg .
+git -c user.name='James Fraser' -c user.email='wulfgar.pro@gmail.com' commit -am "Added encrypted history"
+git push "https://$ACCESS_KEY@github.com/wulfgarpro/history-sync-test"
 echo "SUCCESS"
