@@ -220,9 +220,7 @@ function history_sync_push() {
         else
             sign='y'
         fi
-    fi
 
-    if [[ -n "$sign" ]]; then
         case "$sign" in
             [Yy]* )
                     ENCRYPT_CMD+="--sign "

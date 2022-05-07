@@ -78,7 +78,7 @@ info "TEST SYNC HISTORY BASIC 0"
 setup
 RAND=$RANDOM
 echo "1 echo $RAND" >> ~/.zsh_history
-echo "$UID" | zhps -y && zhpl -y
+zhps -y -r $UID && zhpl -y
 check_history "^1 echo $RAND$"
 success "SUCCESS"
 
@@ -94,7 +94,7 @@ echo "2 echo $RAND1" >> ~/.zsh_history
 echo "3 echo $RAND2" >> ~/.zsh_history
 echo "4 echo $RAND3" >> ~/.zsh_history
 echo "5 echo $RAND4" >> ~/.zsh_history
-zhps -y -r $UID && zhpl -y
+zhps -y -r $UID -s $UID && zhpl -y
 check_history "^1 echo $RAND0$"
 check_history "^2 echo $RAND1$"
 check_history "^3 echo $RAND2$"
