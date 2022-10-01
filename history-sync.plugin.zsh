@@ -66,9 +66,9 @@ function _squash_multiline_commands_in_files() {
     # Generate random character sequences to replace \n and anchor the first
     # line of a command (use global variable for new-line-replacement to use it
     # in the restore-multi-line commands function)
-    NL_REPLACEMENT=$(tr -dc 'a-zA-Z0-9' < /dev/urandom |
+    NL_REPLACEMENT=$(LC_ALL=C tr -dc 'a-zA-Z0-9' < /dev/urandom |
         fold -w 32 | head -n 1)
-    local FIRST_LINE_ANCHOR=$(tr -dc 'a-zA-Z0-9' < /dev/urandom |
+    local FIRST_LINE_ANCHOR=$(LC_ALL=C tr -dc 'a-zA-Z0-9' < /dev/urandom |
         fold -w 32 | head -n 1)
 
     for i in "$ZSH_HISTORY_FILE" "$ZSH_HISTORY_FILE_DECRYPT_NAME"; do
@@ -99,7 +99,7 @@ function _squash_multiline_commands_in_files() {
         cat "${TMP_FILE_1}" >> "${i}"
 
         # Sort history file
-        sort -n < "${i}" > "${TMP_FILE_1}" && mv "${TMP_FILE_1}" "${i}"
+        LC_ALL=C sort -n < "${i}" > "${TMP_FILE_1}" && mv "${TMP_FILE_1}" "${i}"
     done
 }
 
