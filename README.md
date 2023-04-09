@@ -61,6 +61,38 @@ zhps -r "John Brown" -r 876T3F78 -r ...
 zhsync
 ```
 
+## Notes for MacOS user
+
+It is highly recommended that you replace MacOS' builtin `sed` and `awk` with GNU version of them.
+The builtin software behaves slightly differently and creates weird compatability bugs
+
+
+```bash
+brew install gnu-sed
+brew install gawk 
+```
+
+# then replace them with the built in version inside mac os by specifying in this in your bashrc, zshrc, etc. (basically your shell init configuration file)
+
+```zsh
+# in your .bashrc
+# # gnu sed to replace macos sed
+PATH="/usr/local/opt/gnu-sed/libexec/gnubin:$PATH"]
+# # gnu awk to replace macos awk
+PATH="/usr/local/opt/gawk/libexec/gnubin:$PATH"
+```
+
+```bash
+# later, check if sed is from gnu version by 
+which sed 
+
+# or 
+sed --version
+
+# it should show you that sed is not /usr/bin/sed but /usr/local/opt/gnu-sed/libexec/gnubin/sed
+# and the version argument will succeed (on mac os version, it will fail saying there is no such option)
+```
+
 ## Demo
 Check out the [screen cast](https://asciinema.org/a/43575).
 
