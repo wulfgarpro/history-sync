@@ -11,7 +11,6 @@
 # * James Fraser <wulfgar.pro@gmail.com>
 #   https://www.wulfgar.pro
 # ----------------------------------------------------------------
-#
 autoload -U colors && colors
 
 alias zhpl=history_sync_pull
@@ -20,6 +19,7 @@ alias zhsync="history_sync_pull && history_sync_push"
 
 GIT=$(which git)
 GPG=$(which gpg)
+SED_VERSION=$(sed --version 2>&1)
 
 ZSH_HISTORY_PROJ="${ZSH_HISTORY_PROJ:-${HOME}/.zsh_history_proj}"
 ZSH_HISTORY_FILE_NAME="${ZSH_HISTORY_FILE_NAME:-.zsh_history}"
@@ -92,9 +92,15 @@ function _squash_multiline_commands_in_files() {
             && mv "${TMP_FILE_2}" "${TMP_FILE_1}"
 
         # Replace all \n with a sequence of symbols
-        SED ':a;N;$!ba;s/\n/'" ${NL_REPLACEMENT} "'/g' \
-            "${TMP_FILE_1}" > "${TMP_FILE_2}" \
-            && mv "${TMP_FILE_2}" "${TMP_FILE_1}"
+        if [[ "$SED_VERSION" == *"GNU"* ]]; then
+          SED ':a;N;$!ba;s/\n/'" ${NL_REPLACEMENT} "'/g' \
+              "${TMP_FILE_1}" > "${TMP_FILE_2}"
+        else
+          # Assume BSD `sed`
+          perl -0777 -pe 's/\n/'" ${NL_REPLACEMENT} "'/g' \
+            "${TMP_FILE_1}" > "${TMP_FILE_2}"
+        fi
+        mv "${TMP_FILE_2}" "${TMP_FILE_1}"
 
         # Replace first line anchor by \n
         SED "s/${FIRST_LINE_ANCHOR} \(: [0-9]\{1,10\}:[0-9]\+;\)/\n\1/g" \
