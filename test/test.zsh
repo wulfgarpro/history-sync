@@ -38,6 +38,7 @@ function check_env_exists() {
 }
 
 function check_history() {
+    cat ~/.zsh_history 
     rg -U "$1" ~/.zsh_history >/dev/null
     [[ $? -eq 0 ]] || {failure "FAILURE: History did not match '$1'"}
 }
@@ -110,4 +111,15 @@ echo \$i
 done" >> ~/.zsh_history
 zhps -y -r $UID && zhpl -y
 check_history "^1 for i in \{1..3\}; do\necho \\\$i\ndone$"
+success "SUCCESS"
+
+info "TEST SYNC HISTORY MULTI-LINE PERL"
+setup
+alias sed="echo"
+echo "1 for i in {1..3}; do
+echo \$i
+done" >> ~/.zsh_history
+zhps -y -r $UID && zhpl -y
+check_history "^1 for i in \{1..3\}; do\necho \\\$i\ndone$"
+unalias sed
 success "SUCCESS"
