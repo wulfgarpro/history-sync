@@ -15,6 +15,7 @@ function success() {
 
 function failure() {
     echo $fg[red]"$1"$reset_color
+    exit 1
 }
 
 function info() {
@@ -23,22 +24,22 @@ function info() {
 
 function check_fn_exists() {
     typeset -f "$1" >/dev/null
-    [[ $? -eq 0 ]] || {failure "FAILURE: Function '$1' missing"; exit $?}
+    [[ $? -eq 0 ]] || {failure "FAILURE: Function '$1' missing"}
 }
 
 function check_alias_exists() {
     alias "$1" >/dev/null
-    [[ $? -eq 0 ]] || {failure "FAILURE: Alias '$1' missing"; exit $?}
+    [[ $? -eq 0 ]] || {failure "FAILURE: Alias '$1' missing"}
 }
 
 function check_env_exists() {
     [[ -v $1 ]]
-    [[ $? -eq 0 ]] || {failure "FAILURE: Environment variable '$1' missing"; exit $?}
+    [[ $? -eq 0 ]] || {failure "FAILURE: Environment variable '$1' missing"}
 }
 
 function check_history() {
     rg -U "$1" ~/.zsh_history >/dev/null
-    [[ $? -eq 0 ]] || {failure "FAILURE: History did not match '$1'"; exit $?}
+    [[ $? -eq 0 ]] || {failure "FAILURE: History did not match '$1'"}
 }
 
 function setup() {
