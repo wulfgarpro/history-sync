@@ -151,6 +151,21 @@ function history_sync_pull() {
         cp -av "$ZSH_HISTORY_FILE" "$ZSH_HISTORY_FILE.backup" 1>&2
     fi
 
+
+    # Clone if not exist
+    if [[ ! -d "$ZSH_HISTORY_PROJ" ]]; then
+        if [[ ! -v ZSH_HISTORY_GIT_REMOTE ]]; then
+            _print_git_error_msg
+            return
+        fi
+
+        "$GIT" clone "$ZSH_HISTORY_GIT_REMOTE" "$ZSH_HISTORY_PROJ"
+        if [[ "$?" != 0 ]]; then
+            _print_git_error_msg
+            return
+        fi
+    fi
+
     # Pull
     cd "$ZSH_HISTORY_PROJ" && "$GIT" pull
     if [[ "$?" != 0 ]]; then
