@@ -40,6 +40,8 @@ Once you have these things in place, it's just a matter of updating the needed e
 * ZSH_HISTORY_FILE_ENC: your encrypted zsh_history file location
 * ZSH_HISTORY_COMMIT_MSG: your default message when pushing to $ZSH_HISTORY_PROJ
 * ZSH_HISTORY_DEFAULT_RECIPIENT: default recipient used when pushing history
+* ZSH_HISTORY_GIT_REMOTE: if set, the plugin will automatically clone the specified Git remote
+  repository on first use
 
 Which have the following defaults:
 
