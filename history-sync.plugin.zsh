@@ -21,6 +21,10 @@ GIT=$(which git)
 GPG=$(which gpg)
 SED_VERSION=$(sed --version 2>&1)
 
+CP() { command cp "$@"; }
+MV() { command mv "$@"; }
+RM() { command rm "$@"; }
+
 ZSH_HISTORY_PROJ="${ZSH_HISTORY_PROJ:-${HOME}/.zsh_history_proj}"
 ZSH_HISTORY_FILE_NAME="${ZSH_HISTORY_FILE_NAME:-.zsh_history}"
 ZSH_HISTORY_FILE="${ZSH_HISTORY_FILE:-${HOME}/${ZSH_HISTORY_FILE_NAME}}"
@@ -84,12 +88,12 @@ function _squash_multiline_commands_in_files() {
 
         # Filter out multi-line commands and remove them from the original file
         GREP -v -x -F -f "${TMP_FILE_1}" "${i}" > "${TMP_FILE_2}" \
-            && mv "${TMP_FILE_2}" "${i}"
+            && MV "${TMP_FILE_2}" "${i}"
 
         # Add anchor before the first line of each command
         SED "s/\(^: [0-9]\{1,10\}:[0-9]\+;\)/${FIRST_LINE_ANCHOR} \1/" \
             "${TMP_FILE_1}" > "${TMP_FILE_2}" \
-            && mv "${TMP_FILE_2}" "${TMP_FILE_1}"
+            && MV "${TMP_FILE_2}" "${TMP_FILE_1}"
 
         # Replace all \n with a sequence of symbols
         if [[ "$SED_VERSION" == *"GNU"* ]]; then
@@ -100,18 +104,18 @@ function _squash_multiline_commands_in_files() {
           perl -0777 -pe 's/\n/'" ${NL_REPLACEMENT} "'/g' \
             "${TMP_FILE_1}" > "${TMP_FILE_2}"
         fi
-        mv "${TMP_FILE_2}" "${TMP_FILE_1}"
+        MV "${TMP_FILE_2}" "${TMP_FILE_1}"
 
         # Replace first line anchor by \n
         SED "s/${FIRST_LINE_ANCHOR} \(: [0-9]\{1,10\}:[0-9]\+;\)/\n\1/g" \
             "${TMP_FILE_1}" > "${TMP_FILE_2}" \
-            && mv "${TMP_FILE_2}" "${TMP_FILE_1}"
+            && MV "${TMP_FILE_2}" "${TMP_FILE_1}"
 
         # Merge squashed multiline commands to the history file
         cat "${TMP_FILE_1}" >> "${i}"
 
         # Sort history file
-        SORT -n < "${i}" > "${TMP_FILE_1}" && mv "${TMP_FILE_1}" "${i}"
+        SORT -n < "${i}" > "${TMP_FILE_1}" && MV "${TMP_FILE_1}" "${i}"
     done
 }
 
@@ -123,11 +127,11 @@ function _restore_multiline_commands_in_file() {
 
     # Filter out unnecessary lines and remove them from the original file
     GREP -v -x -F -f "${TMP_FILE_1}" "$ZSH_HISTORY_FILE" > "${TMP_FILE_2}" && \
-        mv "${TMP_FILE_2}" "$ZSH_HISTORY_FILE"
+        MV "${TMP_FILE_2}" "$ZSH_HISTORY_FILE"
 
     # Replace the sequence of symbols by \n to restore multi-line commands
     SED "s/ ${NL_REPLACEMENT} /\n/g" "$ZSH_HISTORY_FILE" > "${TMP_FILE_1}" \
-        && mv "${TMP_FILE_1}" "$ZSH_HISTORY_FILE"
+        && MV "${TMP_FILE_1}" "$ZSH_HISTORY_FILE"
 
     # Unset global variables
     unset NL_REPLACEMENT TMP_FILE_1 TMP_FILE_2
@@ -148,7 +152,7 @@ function history_sync_pull() {
 
     # Backup
     if [[ $force = false ]]; then
-        cp -av "$ZSH_HISTORY_FILE" "$ZSH_HISTORY_FILE.backup" 1>&2
+        CP -av "$ZSH_HISTORY_FILE" "$ZSH_HISTORY_FILE.backup" 1>&2
     fi
 
     # Pull
@@ -175,8 +179,8 @@ function history_sync_pull() {
     cat "$ZSH_HISTORY_FILE" "$ZSH_HISTORY_FILE_DECRYPT_NAME" | \
       AWK '/:[0-9]/ { if(s) { print s } s=$0 } !/:[0-9]/ { s=s"\n"$0 } END { print s }' \
       | SORT -u > "$ZSH_HISTORY_FILE_MERGED_NAME"
-    mv "$ZSH_HISTORY_FILE_MERGED_NAME" "$ZSH_HISTORY_FILE"
-    rm  "$ZSH_HISTORY_FILE_DECRYPT_NAME"
+    MV "$ZSH_HISTORY_FILE_MERGED_NAME" "$ZSH_HISTORY_FILE"
+    RM  "$ZSH_HISTORY_FILE_DECRYPT_NAME"
     cd  "$DIR"
 
     # Check if EXTENDED_HISTORY is enabled, and if so, restore multi-line
