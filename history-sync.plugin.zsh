@@ -220,9 +220,13 @@ history_sync_push() {
 
     # Encrypt
     if ! [[ "${#recipients[@]}" > 0 ]]; then
-        echo -n "Please enter GPG recipient name: "
-        read name
-        recipients+="$name"
+        if [[ -v ZSH_HISTORY_DEFAULT_RECIPIENT ]]; then
+            recipients+="$ZSH_HISTORY_DEFAULT_RECIPIENT"
+        else
+            echo -n "Please enter GPG recipient name: "
+            read name
+            recipients+="$name"
+        fi
     fi
 
     GPG_ENCRYPT_CMD_OPT="--yes -v "
