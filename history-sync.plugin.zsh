@@ -11,19 +11,30 @@
 # * James Fraser <wulfgar.pro@gmail.com>
 #   https://www.wulfgar.pro
 # ----------------------------------------------------------------
+export LC_ALL=C
+
 autoload -U colors && colors
 
 alias zhpl=history_sync_pull
 alias zhps=history_sync_push
 alias zhsync="history_sync_pull && history_sync_push"
 
-GIT=$(which git)
-GPG=$(which gpg)
-SED_VERSION=$(sed --version 2>&1)
-
 CP() { command cp "$@"; }
 MV() { command mv "$@"; }
 RM() { command rm "$@"; }
+TR() { command tr "$@"; }
+AWK() { command awk "$@"; }
+CAT() { command cat "$@"; }
+GIT() { command git "$@"; }
+GPG() { command gpg "$@"; }
+SED() { command sed "$@"; }
+DATE() { command date "$@"; }
+FOLD() { command fold "$@"; }
+GREP() { command grep "$@"; }
+HEAD() { command head "$@"; }
+PERL() { command perl "$@"; }
+SORT() { command sort "$@"; }
+MKTEMP() { command mktemp "$@"; }
 
 ZSH_HISTORY_PROJ="${ZSH_HISTORY_PROJ:-${HOME}/.zsh_history_proj}"
 ZSH_HISTORY_FILE_NAME="${ZSH_HISTORY_FILE_NAME:-.zsh_history}"
@@ -32,13 +43,7 @@ ZSH_HISTORY_FILE_ENC_NAME="${ZSH_HISTORY_FILE_ENC_NAME:-zsh_history}"
 ZSH_HISTORY_FILE_ENC="${ZSH_HISTORY_FILE_ENC:-${ZSH_HISTORY_PROJ}/${ZSH_HISTORY_FILE_ENC_NAME}}"
 ZSH_HISTORY_FILE_DECRYPT_NAME="${ZSH_HISTORY_FILE_DECRYPT_NAME:-zsh_history_decrypted}"
 ZSH_HISTORY_FILE_MERGED_NAME="${ZSH_HISTORY_FILE_MERGED_NAME:-zsh_history_merged}"
-ZSH_HISTORY_COMMIT_MSG="${ZSH_HISTORY_COMMIT_MSG:-latest $(date)}"
-
-function SED() {LC_ALL=C sed "$@";}
-function AWK() {LC_ALL=C awk "$@";}
-function GREP() {LC_ALL=C grep "$@";}
-function SORT() {LC_ALL=C sort "$@";}
-function TR() {LC_ALL=C tr "$@";}
+ZSH_HISTORY_COMMIT_MSG="${ZSH_HISTORY_COMMIT_MSG:-latest $(DATE)}"
 
 function _print_git_error_msg() {
     echo "$bold_color${fg[red]}There's a problem with git repository: ${ZSH_HISTORY_PROJ}.$reset_color"
@@ -77,9 +82,9 @@ function _squash_multiline_commands_in_files() {
     # line of a command (use global variable for new-line-replacement to use it
     # in the restore-multi-line commands function)
     NL_REPLACEMENT=$(TR -dc 'a-zA-Z0-9' < /dev/urandom |
-        fold -w 32 | head -n 1)
+        FOLD -w 32 | HEAD -n 1)
     local FIRST_LINE_ANCHOR=$(TR -dc 'a-zA-Z0-9' < /dev/urandom |
-        fold -w 32 | head -n 1)
+        FOLD -w 32 | HEAD -n 1)
 
     for i in "$ZSH_HISTORY_FILE" "$ZSH_HISTORY_FILE_DECRYPT_NAME"; do
         # Filter out multi-line commands and save them to a separate file
@@ -96,12 +101,12 @@ function _squash_multiline_commands_in_files() {
             && MV "${TMP_FILE_2}" "${TMP_FILE_1}"
 
         # Replace all \n with a sequence of symbols
-        if [[ "$SED_VERSION" == *"GNU"* ]]; then
+        if [[ "$(SED --version 2>&1)"  == *"GNU"* ]]; then
           SED ':a;N;$!ba;s/\n/'" ${NL_REPLACEMENT} "'/g' \
               "${TMP_FILE_1}" > "${TMP_FILE_2}"
         else
           # Assume BSD `sed`
-          perl -0777 -pe 's/\n/'" ${NL_REPLACEMENT} "'/g' \
+          PERL -0777 -pe 's/\n/'" ${NL_REPLACEMENT} "'/g' \
             "${TMP_FILE_1}" > "${TMP_FILE_2}"
         fi
         MV "${TMP_FILE_2}" "${TMP_FILE_1}"
@@ -112,7 +117,7 @@ function _squash_multiline_commands_in_files() {
             && MV "${TMP_FILE_2}" "${TMP_FILE_1}"
 
         # Merge squashed multiline commands to the history file
-        cat "${TMP_FILE_1}" >> "${i}"
+        CAT "${TMP_FILE_1}" >> "${i}"
 
         # Sort history file
         SORT -n < "${i}" > "${TMP_FILE_1}" && MV "${TMP_FILE_1}" "${i}"
@@ -156,7 +161,7 @@ function history_sync_pull() {
     fi
 
     # Pull
-    cd "$ZSH_HISTORY_PROJ" && "$GIT" pull
+    cd "$ZSH_HISTORY_PROJ" && GIT pull
     if [[ "$?" != 0 ]]; then
         _print_git_error_msg
         cd "$DIR"
@@ -164,7 +169,7 @@ function history_sync_pull() {
     fi
 
     # Decrypt
-    "$GPG" --output "$ZSH_HISTORY_FILE_DECRYPT_NAME" --decrypt "$ZSH_HISTORY_FILE_ENC"
+    GPG --output "$ZSH_HISTORY_FILE_DECRYPT_NAME" --decrypt "$ZSH_HISTORY_FILE_ENC"
     if [[ "$?" != 0 ]]; then
         _print_gpg_decrypt_error_msg
         cd "$DIR"
@@ -176,7 +181,7 @@ function history_sync_pull() {
     [[ -o extendedhistory ]] && _squash_multiline_commands_in_files
 
     # Merge
-    cat "$ZSH_HISTORY_FILE" "$ZSH_HISTORY_FILE_DECRYPT_NAME" | \
+    CAT "$ZSH_HISTORY_FILE" "$ZSH_HISTORY_FILE_DECRYPT_NAME" | \
       AWK '/:[0-9]/ { if(s) { print s } s=$0 } !/:[0-9]/ { s=s"\n"$0 } END { print s }' \
       | SORT -u > "$ZSH_HISTORY_FILE_MERGED_NAME"
     MV "$ZSH_HISTORY_FILE_MERGED_NAME" "$ZSH_HISTORY_FILE"
@@ -224,18 +229,18 @@ function history_sync_push() {
         fi
     fi
 
-    ENCRYPT_CMD="$GPG --yes -v "
+    GPG_ENCRYPT_CMD_OPT="--yes -v "
     for r in "${recipients[@]}"; do
-        ENCRYPT_CMD+="-r \"$r\" "
+        GPG_ENCRYPT_CMD_OPT+="-r \"$r\" "
     done
     if [[ "${#signers[@]}" > 0 ]]; then
-        ENCRYPT_CMD+="--sign "
+        GPG_ENCRYPT_CMD_OPT+="--sign "
         for s in "${signers[@]}"; do
-            ENCRYPT_CMD+="--default-key \"$s\" "
+            GPG_ENCRYPT_CMD_OPT+="--default-key \"$s\" "
         done
     fi
 
-    if [[ "$ENCRYPT_CMD" != *"--sign"* ]]; then
+    if [[ "$GPG_ENCRYPT_CMD_OPT" != *"--sign"* ]]; then
         if [[ $force = false ]]; then
             echo -n "$bold_color${fg[yellow]}Do you want to sign with first key found in secret keyring (y/N)?$reset_color "
             read sign
@@ -245,16 +250,16 @@ function history_sync_push() {
 
         case "$sign" in
             [Yy]* )
-                    ENCRYPT_CMD+="--sign "
+                    GPG_ENCRYPT_CMD_OPT+="--sign "
                     ;;
                 * )
                     ;;
         esac
     fi
 
-    if [[ "$ENCRYPT_CMD" =~ '.(-r).+.' ]]; then
-        ENCRYPT_CMD+="--encrypt --armor --output $ZSH_HISTORY_FILE_ENC $ZSH_HISTORY_FILE"
-        eval "$ENCRYPT_CMD"
+    if [[ "$GPG_ENCRYPT_CMD_OPT" =~ '.(-r).+.' ]]; then
+        GPG_ENCRYPT_CMD_OPT+="--encrypt --armor --output $ZSH_HISTORY_FILE_ENC $ZSH_HISTORY_FILE"
+        eval GPG "$GPG_ENCRYPT_CMD_OPT"
         if [[ "$?" != 0 ]]; then
             _print_gpg_encrypt_error_msg
             return
@@ -272,7 +277,7 @@ function history_sync_push() {
             case "$commit" in
                 [Yy]* )
                     DIR=$(pwd)
-                    cd "$ZSH_HISTORY_PROJ" && "$GIT" add * && "$GIT" commit -m "$ZSH_HISTORY_COMMIT_MSG"
+                    cd "$ZSH_HISTORY_PROJ" && GIT add * && GIT commit -m "$ZSH_HISTORY_COMMIT_MSG"
 
                     if [[ $force = false ]]; then
                         echo -n "$bold_color${fg[yellow]}Do you want to push to remote (y/N)?$reset_color "
@@ -284,7 +289,7 @@ function history_sync_push() {
                     if [[ -n "$push" ]]; then
                         case "$push" in
                             [Yy]* )
-                                "$GIT" push
+                                GIT push
                                 if [[ "$?" != 0 ]]; then
                                     _print_git_error_msg
                                     cd "$DIR"
