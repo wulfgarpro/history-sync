@@ -45,22 +45,22 @@ ZSH_HISTORY_FILE_DECRYPT_NAME="${ZSH_HISTORY_FILE_DECRYPT_NAME:-zsh_history_decr
 ZSH_HISTORY_FILE_MERGED_NAME="${ZSH_HISTORY_FILE_MERGED_NAME:-zsh_history_merged}"
 ZSH_HISTORY_COMMIT_MSG="${ZSH_HISTORY_COMMIT_MSG:-latest $(DATE)}"
 
-function _print_git_error_msg() {
+_print_git_error_msg() {
     echo "$bold_color${fg[red]}There's a problem with git repository: ${ZSH_HISTORY_PROJ}.$reset_color"
     return
 }
 
-function _print_gpg_encrypt_error_msg() {
+_print_gpg_encrypt_error_msg() {
     echo "$bold_color${fg[red]}GPG failed to encrypt history file.$reset_color"
     return
 }
 
-function _print_gpg_decrypt_error_msg() {
+_print_gpg_decrypt_error_msg() {
     echo "$bold_color${fg[red]}GPG failed to decrypt history file.$reset_color"
     return
 }
 
-function _usage() {
+_usage() {
     echo "Usage: [ [-r <string> ...] [-y] ]" 1>&2
     echo
     echo "Optional args:"
@@ -71,7 +71,7 @@ function _usage() {
 }
 
 # "Squash" each multi-line command in the passed history files to one line
-function _squash_multiline_commands_in_files() {
+_squash_multiline_commands_in_files() {
     # Create temporary files
     # Use global variables to use same path's in the restore-multi-line commands
     # function
@@ -125,7 +125,7 @@ function _squash_multiline_commands_in_files() {
 }
 
 # Restore multi-line commands in the history file
-function _restore_multiline_commands_in_file() {
+_restore_multiline_commands_in_file() {
     # Filter unnecessary lines from the history file (Binary file ... matches)
     # and save them in a separate file
     GREP -v '^: [0-9]\{1,10\}:[0-9]\+;' "$ZSH_HISTORY_FILE" > "${TMP_FILE_1}"
@@ -143,7 +143,7 @@ function _restore_multiline_commands_in_file() {
 }
 
 # Pull current master, decrypt, and merge with .zsh_history
-function history_sync_pull() {
+history_sync_pull() {
     # Get options force
     local force=false
     while getopts y opt; do
@@ -195,7 +195,7 @@ function history_sync_pull() {
 }
 
 # Encrypt and push current history to master
-function history_sync_push() {
+history_sync_push() {
     # Get options recipients, force
     local recipients=()
     local signers=()
