@@ -203,10 +203,10 @@ history_sync_push() {
     while getopts r:s:y opt; do
         case "$opt" in
             r)
-                recipients+="$OPTARG"
+                recipients+=("$OPTARG")
                 ;;
             s)
-                signers+="$OPTARG"
+                signers+=("$OPTARG")
                 ;;
             y)
                 force=true
@@ -221,11 +221,11 @@ history_sync_push() {
     # Encrypt
     if ! [[ "${#recipients[@]}" > 0 ]]; then
         if [[ -v ZSH_HISTORY_DEFAULT_RECIPIENT ]]; then
-            recipients+="$ZSH_HISTORY_DEFAULT_RECIPIENT"
+            recipients+=("$ZSH_HISTORY_DEFAULT_RECIPIENT")
         else
             echo -n "Please enter GPG recipient name: "
             read name
-            recipients+="$name"
+            recipients+=("$name")
         fi
     fi
 
