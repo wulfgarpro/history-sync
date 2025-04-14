@@ -1,15 +1,11 @@
 # ----------------------------------------------------------------
 # Description
-# -----------
+# ----------------------------------------------------------------
 # An Oh My Zsh plugin for GPG encrypted, Internet synchronized Zsh
 # history using Git.
 #
 # ----------------------------------------------------------------
-# Authors
-# -------
-#
-# * James Fraser <wulfgar.pro@gmail.com>
-#   https://www.wulfgar.pro
+# James Fraser <wulfgar.pro@gmail.com> - https://www.wulfgar.pro
 # ----------------------------------------------------------------
 export LC_ALL=C
 
