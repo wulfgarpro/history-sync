@@ -203,10 +203,10 @@ history_sync_push() {
     while getopts r:s:y opt; do
         case "$opt" in
             r)
-                recipients+="$OPTARG"
+                recipients+=("$OPTARG")
                 ;;
             s)
-                signers+="$OPTARG"
+                signers+=("$OPTARG")
                 ;;
             y)
                 force=true
@@ -222,7 +222,7 @@ history_sync_push() {
     if ! [[ "${#recipients[@]}" > 0 ]]; then
         echo -n "Please enter GPG recipient name: "
         read name
-        recipients+="$name"
+        recipients+=("$name")
     fi
 
     GPG_ENCRYPT_CMD_OPT="--yes -v "
