@@ -1,13 +1,13 @@
 #!/usr/bin/env zsh
+set -Eeuo pipefail
+IFS=$'\n\t'
 
 ACCESS_KEY=$1
 
-set -e
 gpg -q --quick-gen-key --yes --batch --passphrase '' $UID
 git config --global user.name "James Fraser"
 git config --global user.email "wulfgar.pro@gmail.com"
 git clone "https://$ACCESS_KEY@github.com/wulfgarpro/history-sync-test" ~/.zsh_history_proj
-set +e
 
 function success() {
     echo $fg[green]"$1"$reset_color
@@ -44,11 +44,9 @@ function check_history() {
 }
 
 function setup() {
-    set -e
     [[ -d ~/.zsh_history_proj ]]
     # Clear existing history file
     echo -n "" > ~/.zsh_history_proj/zsh_history
-    set +e
 }
 
 info "TEST HISTORY-SYNC FUNCTIONS EXIST"
