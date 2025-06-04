@@ -61,7 +61,7 @@ _usage() {
     echo
     echo "Optional args:"
     echo
-    echo "      -r receipients"
+    echo "      -r recipients"
     echo "      -y force"
     return
 }
