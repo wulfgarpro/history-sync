@@ -254,7 +254,7 @@ history_sync_push() {
     fi
 
     if [[ "$GPG_ENCRYPT_CMD_OPT" =~ '.(-r).+.' ]]; then
-        GPG_ENCRYPT_CMD_OPT+="--encrypt --armor --output $ZSH_HISTORY_FILE_ENC $ZSH_HISTORY_FILE"
+        GPG_ENCRYPT_CMD_OPT+="--encrypt --armor --output \"$ZSH_HISTORY_FILE_ENC\" \"$ZSH_HISTORY_FILE\""
         eval GPG "$GPG_ENCRYPT_CMD_OPT"
         if [[ "$?" != 0 ]]; then
             _print_gpg_encrypt_error_msg
