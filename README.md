@@ -1,9 +1,11 @@
 [![history-sync](https://github.com/wulfgarpro/history-sync/actions/workflows/actions.yml/badge.svg)](https://github.com/wulfgarpro/history-sync/actions/workflows/actions.yml)
 
 # history-sync
+>
 > An Oh My Zsh plugin for GPG encrypted, Internet synchronized Zsh history using Git.
 
 ## Installation
+
 ```bash
 sudo apt install gpg git
 git clone git@github.com:wulfgarpro/history-sync.git
@@ -23,6 +25,7 @@ zsh
 ```
 
 ## Usage
+
 Before history-sync can be useful, you need two things:
 
 1. A hosted git repository, e.g. GitHub, Bitbucket
@@ -36,6 +39,7 @@ Once you have these things in place, it's just a matter of updating the needed e
 * ZSH_HISTORY_PROJ: your git project for housing your zsh_history file
 * ZSH_HISTORY_FILE_ENC: your encrypted zsh_history file location
 * ZSH_HISTORY_COMMIT_MSG: your default message when pushing to $ZSH_HISTORY_PROJ
+* ZSH_HISTORY_DEFAULT_RECIPIENT: default recipient used when pushing history
 
 Which have the following defaults:
 
@@ -46,6 +50,7 @@ ZSH_HISTORY_PROJ="${HOME}/.zsh_history_proj"
 ZSH_HISTORY_FILE_ENC_NAME="zsh_history"
 ZSH_HISTORY_FILE_ENC="${ZSH_HISTORY_PROJ}/${ZSH_HISTORY_FILE_ENC_NAME}"
 ZSH_HISTORY_COMMIT_MSG="latest $(date)"
+ZSH_HISTORY_DEFAULT_RECIPIENT=""
 ```
 
 and running the commands:
@@ -57,12 +62,17 @@ zhpl
 # push history
 zhps -r "John Brown" -r 876T3F78 -r ...
 
+# Alternatively set `ZSH_HISTORY_DEFAULT_RECIPIENT` and omit `-r`:
+# ZSH_HISTORY_DEFAULT_RECIPIENT="John Brown"
+
 # pull and push history
 zhsync
 ```
 
 ## Demo
+
 Check out the [screen cast](https://asciinema.org/a/43575).
 
 ## Licence
+
 MIT @ [James Fraser](https://www.wulfgar.pro)

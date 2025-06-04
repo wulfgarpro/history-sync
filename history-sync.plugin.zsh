@@ -40,6 +40,7 @@ ZSH_HISTORY_FILE_ENC="${ZSH_HISTORY_FILE_ENC:-${ZSH_HISTORY_PROJ}/${ZSH_HISTORY_
 ZSH_HISTORY_FILE_DECRYPT_NAME="${ZSH_HISTORY_FILE_DECRYPT_NAME:-zsh_history_decrypted}"
 ZSH_HISTORY_FILE_MERGED_NAME="${ZSH_HISTORY_FILE_MERGED_NAME:-zsh_history_merged}"
 ZSH_HISTORY_COMMIT_MSG="${ZSH_HISTORY_COMMIT_MSG:-latest $(DATE)}"
+ZSH_HISTORY_DEFAULT_RECIPIENT="${ZSH_HISTORY_DEFAULT_RECIPIENT:-}"
 
 _print_git_error_msg() {
     echo "$bold_color${fg[red]}There's a problem with git repository: ${ZSH_HISTORY_PROJ}.$reset_color"
@@ -217,7 +218,7 @@ history_sync_push() {
 
     # Encrypt
     if ! [[ "${#recipients[@]}" > 0 ]]; then
-        if [[ -v ZSH_HISTORY_DEFAULT_RECIPIENT ]]; then
+        if [[ -n "$ZSH_HISTORY_DEFAULT_RECIPIENT" ]]; then
             recipients+=("$ZSH_HISTORY_DEFAULT_RECIPIENT")
         else
             echo -n "Please enter GPG recipient name: "
