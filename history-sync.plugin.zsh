@@ -62,6 +62,7 @@ _usage() {
     echo "Optional args:"
     echo
     echo "      -r recipients"
+    echo "      -s signers"
     echo "      -y force"
     return
 }
