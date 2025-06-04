@@ -275,6 +275,7 @@ history_sync_push() {
                 [Yy]* )
                     DIR=$(pwd)
                     cd "$ZSH_HISTORY_PROJ" && GIT add * && GIT commit -m "$ZSH_HISTORY_COMMIT_MSG"
+                    local local_status=$?
 
                     if [[ $force = false ]]; then
                         echo -n "$bold_color${fg[yellow]}Do you want to push to remote (y/N)?$reset_color "
@@ -287,19 +288,14 @@ history_sync_push() {
                         case "$push" in
                             [Yy]* )
                                 GIT push
-                                if [[ "$?" != 0 ]]; then
-                                    _print_git_error_msg
-                                    cd "$DIR"
-                                    return
-                                fi
-                                cd "$DIR"
+                                local_status=$?
                                 ;;
                         esac
                     fi
 
-                    if [[ "$?" != 0 ]]; then
+                    cd "$DIR"
+                    if [[ "$local_status" != 0 ]]; then
                         _print_git_error_msg
-                        cd "$DIR"
                         return
                     fi
                     ;;
