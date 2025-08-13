@@ -7,7 +7,6 @@
 # ----------------------------------------------------------------
 # James Fraser <wulfgar.pro@gmail.com> - https://www.wulfgar.pro
 # ----------------------------------------------------------------
-export LC_ALL=C
 
 autoload -U colors && colors
 
@@ -18,7 +17,7 @@ alias zhsync="history_sync_pull && history_sync_push"
 CP() { command cp "$@"; }
 MV() { command mv "$@"; }
 RM() { command rm "$@"; }
-TR() { command tr "$@"; }
+TR() { LC_ALL=C command tr "$@"; }
 AWK() { command awk "$@"; }
 CAT() { command cat "$@"; }
 GIT() { command git "$@"; }
@@ -29,7 +28,7 @@ FOLD() { command fold "$@"; }
 GREP() { command grep "$@"; }
 HEAD() { command head "$@"; }
 PERL() { command perl "$@"; }
-SORT() { command sort "$@"; }
+SORT() { LC_ALL=C command sort "$@"; }
 MKTEMP() { command mktemp "$@"; }
 
 ZSH_HISTORY_PROJ="${ZSH_HISTORY_PROJ:-${HOME}/.zsh_history_proj}"
@@ -180,8 +179,8 @@ history_sync_pull() {
 
     # Merge
     CAT "$ZSH_HISTORY_FILE" "$ZSH_HISTORY_FILE_DECRYPT_NAME" | \
-      AWK '/:[0-9]/ { if(s) { print s } s=$0 } !/:[0-9]/ { s=s"\n"$0 } END { print s }' \
-      | SORT -u > "$ZSH_HISTORY_FILE_MERGED_NAME"
+      AWK '/:[0-9]/ { if(s) { print s } s=$0 } !/:[0-9]/ { s=s"\n"$0 } END { print s }' | \
+      SORT -u > "$ZSH_HISTORY_FILE_MERGED_NAME"
     MV "$ZSH_HISTORY_FILE_MERGED_NAME" "$ZSH_HISTORY_FILE"
     RM  "$ZSH_HISTORY_FILE_DECRYPT_NAME"
     cd  "$DIR"
