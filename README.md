@@ -1,7 +1,7 @@
 [![history-sync](https://github.com/wulfgarpro/history-sync/actions/workflows/actions.yml/badge.svg)](https://github.com/wulfgarpro/history-sync/actions/workflows/actions.yml)
 
 # history-sync
->
+
 > An Oh My Zsh plugin for GPG encrypted, Internet synchronized Zsh history using Git.
 
 ## Installation
@@ -12,38 +12,36 @@ git clone git@github.com:wulfgarpro/history-sync.git
 cp -r history-sync ~/.oh-my-zsh/plugins
 ```
 
-Then open .zshrc file and append history-sync to the plugin line:
+Open `.zshrc` file and add `history-sync` to the plugins list:
 
 ```bash
 plugins=(... history-sync)
 ```
 
-And finally, reload zsh:
+The reaload Zsh:
 
 ```bash
-zsh
+exec zsh
 ```
 
 ## Usage
 
-Before history-sync can be useful, you need two things:
+Before using `history-sync`, ensure you have:
 
-1. A hosted git repository, e.g. GitHub, Bitbucket
-   * Ideally with ssh key access
-2. A configured gpg key pair for encrypting and decrypting your history file and the enrolled public keys of all the nodes in your web of trust
-   * See [the GnuPG documentation](https://www.gnupg.org/documentation/) for more information since it's outside the scope of this README
+1. A hosted Git repository, e.g. GitHub, Bitbucket, with SSH key access.
+2. A configured GPG key pair for encrypting/decrypting your history file, and the public keys of all
+   nodes in your web-of-trust.
+   * See [the GnuPG documentation](https://www.gnupg.org/documentation/) for details.
 
-Once you have these things in place, it's just a matter of updating the needed environment variables to suit your configuration:
+Once set up, configure the following environment variables:
 
-* ZSH_HISTORY_FILE: your zsh_history file location
-* ZSH_HISTORY_PROJ: your git project for housing your zsh_history file
-* ZSH_HISTORY_FILE_ENC: your encrypted zsh_history file location
-* ZSH_HISTORY_COMMIT_MSG: your default message when pushing to $ZSH_HISTORY_PROJ
-* ZSH_HISTORY_DEFAULT_RECIPIENT: default recipient used when pushing history
-* ZSH_HISTORY_GIT_REMOTE: if set, the plugin will automatically clone the specified Git remote
-  repository on first use
+* `ZSH_HISTORY_FILE`: your `zsh_history` file location
+* `ZSH_HISTORY_PROJ`: Git project for storing `zsh_history`
+* `ZSH_HISTORY_FILE_ENC`: encrypted history file location
+* `ZSH_HISTORY_COMMIT_MSG`: default commit message when pushing
+* `ZSH_HISTORY_DEFAULT_RECIPIENT`: default recipient for `zhps`
 
-Which have the following defaults:
+Defaults:
 
 ```bash
 ZSH_HISTORY_FILE_NAME=".zsh_history"
@@ -55,19 +53,23 @@ ZSH_HISTORY_COMMIT_MSG="latest $(date)"
 ZSH_HISTORY_DEFAULT_RECIPIENT=""
 ```
 
-and running the commands:
+Optional:
+
+* `ZSH_HISTORY_GIT_REMOTE`: if set, the plugin clones the remote repo on first use
+
+## Commands
 
 ```bash
-# pull history
+# Pull history
 zhpl
 
-# push history
+# Push history
 zhps -r "John Brown" -r 876T3F78 -r ...
 
-# Alternatively set `ZSH_HISTORY_DEFAULT_RECIPIENT` and omit `-r`:
+# Or set a default recipient to omit -r:
 # ZSH_HISTORY_DEFAULT_RECIPIENT="John Brown"
 
-# pull and push history
+# Pull + push history
 zhsync
 ```
 
