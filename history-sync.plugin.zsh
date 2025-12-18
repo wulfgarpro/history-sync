@@ -203,6 +203,9 @@ history_sync_pull() {
     # Check if EXTENDED_HISTORY is enabled, and if so, restore multi-line
     # commands in the local history file
     [[ -o extendedhistory ]] && _restore_multiline_commands_in_file
+    # Strip trailing '\' if the next line is blank
+    SED -E -i '/\\$/ { N; s/\\+\n$/\n/ }' "$ZSH_HISTORY_FILE"
+    # Strip blank lines
     SED -i '/^$/d' "$ZSH_HISTORY_FILE"
 }
 
